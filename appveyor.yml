@@ -1,6 +1,11 @@
 # See http://www.appveyor.com/docs/appveyor-yml for many more options
 
-#Publish to PowerShell Gallery with this key
+# Only run AppVeyor on master branch
+branches:
+  only:
+    - master
+
+# Publish to PowerShell Gallery with this key
 environment:
   NuGetApiKey:
     secure: AZ37p+H63dtSWUV6jbQg6s8PDNEDpF8ApLFqwc665zRy4dgUdCA5lVkawzaIHUnr
