@@ -31,7 +31,6 @@ install:
     Install-Module -Name posh-git -Force
 
 image: WMF 5
-install:
 
 build_script:
 - ps: Get-PackageProvider -ListAvailable
