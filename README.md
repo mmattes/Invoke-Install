@@ -13,7 +13,7 @@ TODO Provide some sample code and a qick how to
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](Doc\CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](Doc/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
