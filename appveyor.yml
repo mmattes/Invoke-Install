@@ -5,10 +5,19 @@ branches:
   only:
     - master
 
+# Ignore testing a commit if only the README.md file changed
+# Or if various strings are found in the commit message: updated readme, update readme, update docs, update version, update appveyor
+skip_commits:
+  files:
+    - README.md
+  message: /updated readme.*|update readme.*s|update docs.*|update version.*|update appveyor.*/
+
 # Publish to PowerShell Gallery with this key
 environment:
   NuGetApiKey:
     secure: AZ37p+H63dtSWUV6jbQg6s8PDNEDpF8ApLFqwc665zRy4dgUdCA5lVkawzaIHUnr
+  GitHubKey:
+    secure: UwnxudS5HgpMcO685izeyD4HbG0Q7RPmfcURwAkd7V+l1/qpL4vEky5Nzl1XD/iL
 
 # Allow WMF5 (i.e. PowerShellGallery functionality)
 os: WMF 5
@@ -24,4 +33,5 @@ build_script:
 
 # to run your custom scripts instead of provider deployments
 deploy_script:
+  - ps: Add-Content "$ENV:USERPROFILE\.git-credentials" "https://$($ENV:GitHubKey):x-oauth-basic@github.com`n"
   - ps: . .\Build\deploy.ps1
