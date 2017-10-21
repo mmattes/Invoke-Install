@@ -1,5 +1,6 @@
 # This is where the module manifest lives
-$ManifestPath = $PSScriptRoot + "\..\Source\Invoke-Build\Invoke-Build.psd1"
+$SourcePath = $PSScriptRoot + "\..\Source\Invoke-Build"
+$ManifestPath = $SourcePath + "\Invoke-Build.psd1"
 
 # Start by importing the manifest to determine the version, then add 1 to the revision
 $Manifest = Test-ModuleManifest -Path $ManifestPath
@@ -10,7 +11,7 @@ Write-Output "New Version: $NewVersion"
 
 Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion
 
-Publish-Module -Path $ENV:APPVEYOR_BUILD_FOLDER\Source\InvokeInstall -NuGetApiKey $ENV:NuGetApiKey -Verbose -ErrorAction Stop
+Publish-Module -Path $SourcePath -NuGetApiKey $ENV:NuGetApiKey -Verbose -ErrorAction Stop
 
 # Publish the new version back to Master on GitHub
 Try 
