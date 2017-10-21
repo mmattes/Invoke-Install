@@ -21,19 +21,19 @@ ModuleVersion = '0.1'
 GUID = 'fbde390d-93e5-4e6b-9d34-cf20edcab0d9'
 
 # Author of this module
-Author = 'mmatte87@gmail.com'
+Author = 'Markus Mattes'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+# CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) mmatte87@gmail.com. All rights reserved.'
+Copyright = '(c) Markus Mattes. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'Module to simplify PowerShell installations'
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = '5.0'
+PowerShellVersion = '5.0'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -72,13 +72,13 @@ Copyright = '(c) mmatte87@gmail.com. All rights reserved.'
 FunctionsToExport = '*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = @()
+# CmdletsToExport = @()
 
 # Variables to export from this module
-VariablesToExport = '*'
+# VariablesToExport = '*'
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = '*'
+# AliasesToExport = '*'
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
@@ -95,10 +95,11 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('Continous', 'Integration', 'Deployment', 'Deploy', 'Installatoin', 'DevOps', 'Install')
 
         # A URL to the license for this module.
         # LicenseUri = ''
+        # TODO
 
         # A URL to the main website for this project.
         # ProjectUri = ''

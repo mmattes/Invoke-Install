@@ -1,4 +1,7 @@
 # TODO: Propper Description of this file above
+# TODO: change all Modules to propper PS Modules? 
+# TODO: Tests? 
+
 function Invoke-Install (
     [Parameter(Position=0, Mandatory=$true, HelpMessage="Path to the *.install.ps1")]
     [string] $InstallFilePath,
