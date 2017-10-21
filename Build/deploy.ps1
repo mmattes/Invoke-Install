@@ -1,1 +1,1 @@
-Publish-Module -Name InvokeInstall -Path "$ENV:APPVEYOR_BUILD_FOLDER\Source\Test-ModuleManifest -Path $manifestPath" -NuGetApiKey $ENV:NuGetApiKey -Verbose
+Publish-Module -Path "$ENV:APPVEYOR_BUILD_FOLDER\Source\InvokeInstall -NuGetApiKey $ENV:NuGetApiKey -Verbose
