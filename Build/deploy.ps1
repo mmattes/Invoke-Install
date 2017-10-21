@@ -5,7 +5,7 @@ $ManifestPath = $PSScriptRoot + "\..\Source\Invoke-Build\Invoke-Build.psd1"
 $Manifest = Test-ModuleManifest -Path $ManifestPath
 [System.Version]$Version = $Manifest.Version
 Write-Output "Old Version: $Version"
-[String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, ($Version.Build+1), $Version.Revision)
+[String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, ($Version.Build+1), 0)
 Write-Output "New Version: $NewVersion"
 
 Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion
