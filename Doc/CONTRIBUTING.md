@@ -126,4 +126,4 @@ Documentation
 We are glad to accept any sort of documentation: function docstrings,
 reStructuredText documents (like this one), tutorials, etc.
 reStructuredText documents live in the source code repository under the
-``doc/`` directory.
+``Doc/`` directory.

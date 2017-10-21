@@ -4,6 +4,14 @@
 
 Module to simplify PowerShell installations
 
+### Description 
+
+Invoke-Install is inspired by PSDeploy and Invoke-Build but rather then using a specific script language/format it just uses Powershell scripts and runs them. Imaging you have an application which comes with several independent services/modules/apis and all of them somehow need to be installed. Rather then having one large installation script for all services/modules/apis you will create independet ```*.install.ps1``` files which all will complete an independent installation.
+
+Invoke-Install comes with special Modules for more complicated tasks so that anything what needs to be done is a one liner. 
+
+The idea is that any ```*.install.ps1``` is plain simple and straight forward understandable, they should not contain functions or a lot of switches or if, loops. 
+
 ### Installing
 
 ```ps
@@ -11,7 +19,23 @@ Install-Module Invoke-Install
 
 ```
 
-TODO Provide some sample code and a qick how to 
+### Usage
+
+Execute the following command to runn all ```*.install.ps1``` files within the same directory
+
+```ps
+Invoke-Install .
+
+```
+
+or specify a specific ```*.install.ps1``` to be used. 
+
+```ps
+Invoke-Install MyApp.install.ps1
+
+```
+
+Check out the Examples in ``Examples/`` to see what currently can be done with Invoke-Install. Feel free to contribute and add more Modules. 
 
 ## Contributing
 
@@ -19,7 +43,7 @@ Please read [CONTRIBUTING.md](Doc/CONTRIBUTING.md) for details on our code of co
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning.
 
 ## Authors
 
