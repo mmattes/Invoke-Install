@@ -15,6 +15,13 @@ os: WMF 5
 
 build: false
 
+image: WMF 5
+install:
+- ps: Install-PackageProvider -Name NuGet -MinimumVersion '2.8.5.201' -Force -Verbose
+build_script:
+- ps: Get-PackageProvider -ListAvailable
+- ps: Get-PackageProvider -Name NuGet
+
 # to run your custom scripts instead of provider deployments
 deploy_script:
   - ps: . .\Build\deploy.ps1
