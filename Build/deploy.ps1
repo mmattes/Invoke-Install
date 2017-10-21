@@ -20,6 +20,7 @@ Try
     # Note that "update version" is included in the appveyor.yml file's "skip a build" regex to avoid a loop
     $ENV:Path += ";$ENV:ProgramFiles\Git\cmd"
     Import-Module Posh-Git -ErrorAction Stop
+    git checkout master
     git add --all
     git status
     git commit -s -m "Update version to $NewVersion"
