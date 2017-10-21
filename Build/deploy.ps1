@@ -1,2 +1,1 @@
-Import-Module $PSScriptRoot/../Source/Invoke-Install.psd1
-Publish-Module -Name Invoke-Install -NuGetApiKey $ENV:NuGetApiKey
+Publish-Module -Path $ENV:BHModulePath -NuGetApiKey $ENV:NuGetApiKey -Verbose
