@@ -130,6 +130,7 @@ function Remove-WindowsTask
             # TODO: Would it work without host? 
             Schtasks /Delete /S $host /TN "$TaskPath\$TaskName" /F
         }
+    }
 
     End { 
     }
