@@ -30,7 +30,7 @@ Author = 'Markus Mattes'
 Copyright = '(c) Markus Mattes. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Module to simplify PowerShell installations'
+Description = 'Module to simplify PowerShell installations. More info on Github'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '5.0'
