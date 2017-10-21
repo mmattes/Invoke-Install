@@ -1,6 +1,6 @@
 # This is where the module manifest lives
-$SourcePath = $PSScriptRoot + "\..\Source\Invoke-Build"
-$ManifestPath = $SourcePath + "\Invoke-Build.psd1"
+$SourcePath = $PSScriptRoot + "\..\Source\Invoke-Install"
+$ManifestPath = $SourcePath + "\Invoke-Install.psd1"
 
 # Start by importing the manifest to determine the version, then add 1 to the revision
 $Manifest = Test-ModuleManifest -Path $ManifestPath
