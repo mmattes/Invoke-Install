@@ -1,20 +1,20 @@
-# Setup variables
+# Setup variables, $TargetRoot is defined in a script used to initialize the setup see install.ps1
 $TargetPath =  $TargetRoot + "\Sample.Windows.Service"
 $ProductZip = $PSScriptRoot + "\Sample.Windows.Service.zip"
 $BinaryPath = $TargetPath + "\bin\Sample.Windows.Service.exe"
 
 # Je nach Umgebung Variabeln die benötigt werden definieren
 switch ($Enviroment) {
-    "Development" {       
+    "Development" {
         $ServiceName = "$Enviroment.Sample.Windows.Service"
     }
-    "Staging" {       
+    "Staging" {
         $ServiceName = "$Enviroment.Sample.Windows.Service"
     }
-    "Production" {       
+    "Production" {
         $ServiceName = "Sample.Windows.Service"
     }
-    "Local" {       
+    "Local" {
         $ServiceName = "Sample.Windows.Service"
     }
     default {
