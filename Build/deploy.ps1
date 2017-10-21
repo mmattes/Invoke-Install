@@ -19,7 +19,7 @@ Try
     # Set up a path to the git.exe cmd, import posh-git to give us control over git, and then push changes to GitHub
     # Note that "update version" is included in the appveyor.yml file's "skip a build" regex to avoid a loop
     $ENV:Path += ";$ENV:ProgramFiles\Git\cmd"
-    Import-Module posh-git -ErrorAction Stop
+    Import-Module Posh-Git -ErrorAction Stop
     git checkout master
     git add --all
     git status

@@ -24,9 +24,15 @@ os: WMF 5
 
 build: false
 
+# Install NuGet to interact with the PowerShell Gallery
+install:
+- ps: |
+    Install-PackageProvider -Name NuGet -MinimumVersion '2.8.5.201' -Force -Verbose
+    Install-Module -Name posh-git -Force
+
 image: WMF 5
 install:
-- ps: Install-PackageProvider -Name NuGet -MinimumVersion '2.8.5.201' -Force -Verbose
+
 build_script:
 - ps: Get-PackageProvider -ListAvailable
 - ps: Get-PackageProvider -Name NuGet
