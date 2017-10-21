@@ -40,6 +40,6 @@ build_script:
 deploy_script:
   - git config --global credential.helper store
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GitHubKey):x-oauth-basic@github.com`n"
-  - git config --global user.email "email@example.com"
-  - git config --global user.name "Chris Wahl"
+  - git config --global user.email "mmattes87@gmail.com"
+  - git config --global user.name "Markus Mattes"
   - ps: . .\Build\deploy.ps1
