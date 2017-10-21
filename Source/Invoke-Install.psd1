@@ -98,11 +98,10 @@ PrivateData = @{
         Tags = @('Continous', 'Integration', 'Deployment', 'Deploy', 'Installatoin', 'DevOps', 'Install')
 
         # A URL to the license for this module.
-        # LicenseUri = ''
-        # TODO
+        LicenseUri = 'https://github.com/mmattes/Invoke-Install/LICENSE.md'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/mmattes/Invoke-Install'
 
         # A URL to an icon representing this module.
         # IconUri = ''
