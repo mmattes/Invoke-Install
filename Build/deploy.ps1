@@ -1,1 +1,1 @@
-Publish-Module -Path $ENV:BHModulePath -NuGetApiKey $ENV:NuGetApiKey -Verbose
+Publish-Module -Path $PSScriptRoot\..\Source -NuGetApiKey $ENV:NuGetApiKey -Verbose
