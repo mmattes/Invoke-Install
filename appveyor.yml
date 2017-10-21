@@ -38,5 +38,8 @@ build_script:
 
 # to run your custom scripts instead of provider deployments
 deploy_script:
-  - ps: Add-Content "$ENV:USERPROFILE\.git-credentials" "https://$($ENV:GitHubKey):x-oauth-basic@github.com`n"
+  - git config --global credential.helper store
+  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:GitHubKey):x-oauth-basic@github.com`n"
+  - git config --global user.email "email@example.com"
+  - git config --global user.name "Chris Wahl"
   - ps: . .\Build\deploy.ps1
