@@ -23,6 +23,8 @@ switch ($Enviroment) {
     }
 }
 
+Stop
+
 # Stop and uninstall the old Service
 Stop-WindowsService $ServiceName
 Remove-WindowsService $ServiceName

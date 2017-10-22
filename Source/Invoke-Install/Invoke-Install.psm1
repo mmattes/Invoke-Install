@@ -1,7 +1,9 @@
 # TODO: Propper Description of this file above
 
 # Import all *.ps1 Files
-Get-ChildItem -Recurse -Path $PSScriptRoot -Filter *.ps1 |
-ForEach-Object {
-    . $_.FullName
+$Modules = Get-ChildItem -Recurse -Path $PSScriptRoot -Filter *.ps1 
+
+foreach ($Module in $Modules) {
+    . $Module.FullName
 }
+
