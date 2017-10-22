@@ -1,21 +1,21 @@
 # Setup variables, $TargetRoot is defined in a script used to initialize the setup see install.ps1
-$TargetPath =  $TargetRoot + "\Sample.Windows.Service"
-$ProductZip = $PSScriptRoot + "\Sample.Windows.Service.zip"
-$BinaryPath = $TargetPath + "\bin\Sample.Windows.Service.exe"
+$TargetPath =  $TargetRoot + "\Sample.NSSM.Service"
+$ProductZip = $PSScriptRoot + "\Sample.NSSM.Service.zip"
+$BinaryPath = $TargetPath + "\bin\Sample.NSSM.Service.exe"
 
 # Setup some more variables depending on enviroment
 switch ($Enviroment) {
     "Development" {
-        $ServiceName = "$Enviroment.Sample.Windows.Service"
+        $ServiceName = "$Enviroment.Sample.NSSM.Service"
     }
     "Staging" {
-        $ServiceName = "$Enviroment.Sample.Windows.Service"
+        $ServiceName = "$Enviroment.Sample.NSSM.Service"
     }
     "Production" {
-        $ServiceName = "Sample.Windows.Service"
+        $ServiceName = "Sample.NSSM.Service"
     }
     "Local" {
-        $ServiceName = "Sample.Windows.Service"
+        $ServiceName = "Sample.NSSM.Service"
     }
     default {
         Write-Output "Enviroment is unkown"
@@ -23,17 +23,17 @@ switch ($Enviroment) {
     }
 }
 
-Stop
-
 # Stop and uninstall the old Service
-Stop-WindowsService $ServiceName
-Remove-WindowsService $ServiceName
+Stop-NSSMService -ServiceName $ServiceName -NSSMBinaryPath .\nssm.exe
+Remove-NSSMService -ServiceName $ServiceName -NSSMBinaryPath .\nssm.exe
  
 Remove-Directory $TargetPath
 
 # Unzip the File containing the binaries and dependencies
 Expand-Archive -Path $ProductZip -Destinationpath $TargetPath
 
-New-WindowsService -ServiceName $ServiceName -DisplayName $ServiceName -BinaryPath $BinaryPath
+New-NSSMService -ServiceName $ServiceName -ServiceBinaryPath $BinaryPath -ServiceArgs "-dothis" -NSSMBinaryPath .\nssm.exe
+Set-NSSMAppDirectory -ServiceName $ServiceName -AppDirectory $TargetPath -NSSMBinaryPath .\nssm.exe
 
-Start-WindowsService $ServiceName
+
+Start-NSSMService -ServiceName $ServiceName -NSSMBinaryPath .\nssm.exe
