@@ -84,10 +84,10 @@ function New-WindowsService
         [string]$DelayedStart= $null, # DelayedAutoStart
 
         [Parameter(Mandatory=$false, Position=7)]
-        [string]$Login       = $null, # NT AUTHORITY\LocalSystem, NT AUTHORITY\LocalService, NT AUTHORITY\NetworkService, <Domain\User>
+        [string]$User       = $null, # NT AUTHORITY\LocalSystem, NT AUTHORITY\LocalService, NT AUTHORITY\NetworkService, <Domain\User>
 
         [Parameter(Mandatory=$false, Position=8)]
-        [string]$Password    = $null
+        [securestring]$SecurePassword    = $null
     )
     
     Begin {
@@ -116,24 +116,27 @@ function New-WindowsService
             }
         }
         
-        if($Login) {
+        if($User) {
             # if password is empty, create a dummy one to allow having credentials for system accounts:
             # NT AUTHORITY\LocalSystem
             # NT AUTHORITY\LocalService
             # NT AUTHORITY\NetworkService
+            $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $User, $SecurePassword
+            $Password = $Credentials.GetNetworkCredential().Password 
+
             if ([string]::IsNullOrEmpty($Password)) {
                 $Password = "dummy"
             }
             else {
                 # Add account to logon as a service.
-                Add-AccountToLogonAsService $Login
+                Add-AccountToLogonAsService $User
             }
             
             $Service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
             
             Stop-WindowsService -Name $ServiceName
             
-            $Service.change($null, $null, $null, $null, $null, $null, $Login, $Password, $null, $null, $null)
+            $Service.change($null, $null, $null, $null, $null, $null, $User, $Password, $null, $null, $null)
         }
         
         Write-Log "Installation completed: $ServiceName"

@@ -81,75 +81,79 @@ function New-IISApplicationPool
     param(
         # Application Pool Settings
         [Parameter(Mandatory=$true, Position=1)]
-        [string]$name                  = $null,
+        [string]$Name                  = $null,
         
-        [bool]  $enable32Bit           = $false,
+        [bool]  $Enable32Bit           = $false,
         
-        [string]$startMode             = $null, # AlwaysRunning, 
-        [string]$managedRuntimeVersion = $null,
-        [string]$idleTimeout           = $null,
-        [string]$periodicRestartTime   = $null,
+        [string]$StartMode             = $null, # AlwaysRunning, 
+        [string]$ManagedRuntimeVersion = $null,
+        [string]$IdleTimeout           = $null,
+        [string]$PeriodicRestartTime   = $null,
         
-                $identityType          = $null,
-        [string]$user                  = $null,
-        [string]$password              = $null,
-        [bool]  $loadUserProfile       = $true
+                $IdentityType          = $null,
+        [string]$User                  = $null,
+        [securestring]$SecurePassword              = $null,
+        [bool]  $LoadUserProfile       = $true
     )
     
     Begin {
         Use-WebAdministration
         # IIS Directory Settings
-        [string]$iisPool = "IIS:\AppPools\$($name)\"
+        [string]$IisPool = "IIS:\AppPools\$($name)\"
         
         # Sets the application pool settings for the given parameter
-        function Set-AppPoolProperties([PSObject]$pool)
+        function Set-AppPoolProperties([PSObject]$Pool)
         {
             if(-not $pool) { throw "Empty application pool, Argument -Pool is missing" }
             
             Write-Log "Configuring ApplicationPool properties"
             
-            if ($startMode            ) { $pool.startMode                      = $startMode             }
-            if ($managedRuntimeVersion) { $pool.managedRuntimeVersion          = $managedRuntimeVersion }
-            if ($idleTimeout          ) { $pool.processModel.idleTimeout       = $idleTimeout           }
-            if ($periodicRestartTime  ) { $pool.recycling.periodicRestart.time = $periodicRestartTime   }
+            if ($StartMode            ) { $Pool.startMode                      = $StartMode             }
+            if ($ManagedRuntimeVersion) { $Pool.managedRuntimeVersion          = $ManagedRuntimeVersion }
+            if ($IdleTimeout          ) { $Pool.processModel.idleTimeout       = $IdleTimeout           }
+            if ($PeriodicRestartTime  ) { $Pool.recycling.periodicRestart.time = $PeriodicRestartTime   }
             
-            if ($identityType -ne $null)
+            if ($IdentityType -ne $null)
             { 
-                $pool.processModel.identityType = $identityType
+                $Pool.processModel.identityType = $IdentityType
                 
-                if($identityType -eq 3) # 3 = SpecificUser
+                if($IdentityType -eq 3) # 3 = SpecificUser
                 {
-                    if(-not $user    ) { throw "Empty user name, Argument -User is missing"  }
-                    if(-not $password) { throw "Empty password, Argument -Password is missing" }
+                    if(-not $User    ) { throw "Empty user name, Argument -User is missing"  }
+                    if(-not $Password) { throw "Empty password, Argument -Password is missing" }
                     
-                    Write-Log "Setting AppPool to run as $user"
+                    Write-Log "Setting AppPool to run as $User"
                     
-                    $pool.processmodel.username = $user
-                    $pool.processmodel.password = $password
+                    $Pool.processmodel.username = $User
+
+                    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $User, $SecurePassword
+                    $Password = $Credentials.GetNetworkCredential().Password 
+
+                    $Pool.processmodel.password = $Password
                 }
             }
             
-            $pool.processModel.loadUserProfile = $loadUserProfile
+            $Pool.processModel.loadUserProfile = $LoadUserProfile
             
-            $pool | Set-Item
+            $Pool | Set-Item
             
-            if($enable32Bit)
+            if($Enable32Bit)
             {
-                Set-ItemProperty $iisPool -Name enable32BitAppOnWin64 -Value "True"
+                Set-ItemProperty $IisPool -Name enable32BitAppOnWin64 -Value "True"
             }
             else
             {
-                Set-ItemProperty $iisPool -Name enable32BitAppOnWin64 -Value "False"
+                Set-ItemProperty $IisPool -Name enable32BitAppOnWin64 -Value "False"
             }
         }
     }
     
     Process {
-        Write-Log "Creating IIS ApplicationPool: $name"
+        Write-Log "Creating IIS ApplicationPool: $Name"
         
-        $pool = New-WebAppPool $name 
+        $Pool = New-WebAppPool $Name
         
-        Set-AppPoolProperties $pool
+        Set-AppPoolProperties $Pool
     }
     
     End { 
