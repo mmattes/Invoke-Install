@@ -92,7 +92,7 @@ function New-IISApplicationPool
         
                 $IdentityType          = $null,
         [string]$User                  = $null,
-        [SecureString]]$SecurePassword              = $null,
+        [SecureString] $SecurePassword              = $null,
         [bool]  $LoadUserProfile       = $true
     )
     
