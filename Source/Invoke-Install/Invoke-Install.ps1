@@ -9,17 +9,12 @@ function Invoke-Install (
 
     [string] $RunParallel =  $false
 ) {
-    # Define all Aliases needed
-    Set-Alias task Add-InstallTask
-
     $InstallScripts = Get-InstallScripts -InstallFilePath $InstallFilePath -Filter $Filter
 
-    if ($RunParallel) {
+    if (!($RunParallel)) {
         Use-InvokeParallel
         foreach ($Script in $InstallScripts) {
-            Invoke-Parallel -ImportVariables -ScriptBlock { 
-                . $Script
-             }
+            Invoke-Parallel -ImportVariables -ScriptBlock { . $Script }
         }
     } else {
         foreach ($Script in $InstallScripts) {
@@ -58,8 +53,14 @@ function Get-InstallScripts (
 }
 
 function Use-InvokeParallel () {
+ #   if (!(Get-Module -ListAvailable -Name Invoke-Parallel)) {
+  #      Install-Module /home/markus/projekte/Invoke-Parallel/Invoke-Parallel/Invoke-Parallel.psd1 -Force -ErrorAction Stop 
+        # Install-Module Invoke-Parallel -Force -ErrorAction Stop 
+  #  } 
+    
     if (!(Get-Module Invoke-Parallel))
     {        
-        Import-Module Invoke-Parallel -ErrorAction Stop
-    }
+        Import-Module /home/markus/projekte/Invoke-Parallel/Invoke-Parallel/Invoke-Parallel.psd1 -ErrorAction Stop
+        # Import-Module Invoke-Parallel -ErrorAction Stop
+    } 
 }

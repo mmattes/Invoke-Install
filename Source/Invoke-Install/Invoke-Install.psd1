@@ -24,7 +24,7 @@ GUID = 'fbde390d-93e5-4e6b-9d34-cf20edcab0d9'
 Author = 'Markus Mattes'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+# CompanyName = ''
 
 # Copyright statement for this module
 Copyright = '(c) Markus Mattes. All rights reserved.'
