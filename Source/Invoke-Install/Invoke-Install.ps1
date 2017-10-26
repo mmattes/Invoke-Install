@@ -11,16 +11,21 @@ function Invoke-Install (
 ) {
     $InstallScripts = Get-InstallScripts -InstallFilePath $InstallFilePath -Filter $Filter
 
-    if (!($RunParallel)) {
-        Use-InvokeParallel
-        foreach ($Script in $InstallScripts) {
+    $Count = 0 
+
+    foreach ($Script in $InstallScripts) {
+        if (!($RunParallel)) {
+            Use-InvokeParallel
             Invoke-Parallel -ImportVariables -ScriptBlock { . $Script }
+        } else {
+            foreach ($Script in $InstallScripts) {
+                . $Script
+            }        
         }
-    } else {
-        foreach ($Script in $InstallScripts) {
-            . $Script
-        }
-    }    
+        $Count += 1
+    }
+
+    return $Count
 }
 
 function Get-InstallScripts (
