@@ -9,7 +9,7 @@ Write-Output "Old Version: $Version"
 [String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, ($Version.Build+1), 0)
 Write-Output "New Version: $NewVersion"
 
-Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion
+Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion -FunctionsToExport '*'
 
 Publish-Module -Path $SourcePath -NuGetApiKey $ENV:NuGetApiKey -Verbose -ErrorAction Stop
 
@@ -20,10 +20,11 @@ Try
     # Note that "update version" is included in the appveyor.yml file's "skip a build" regex to avoid a loop
     $ENV:Path += ";$ENV:ProgramFiles\Git\cmd"
     Import-Module Posh-Git -ErrorAction Stop    
+    git checkout master
     git add --all
     git status
     git commit -s -m "Update version to $NewVersion"
-    git push origin/master master
+    git push origin master
     Write-Host "PowerShell Module version $NewVersion published to GitHub." -ForegroundColor Cyan
 }
 Catch 
