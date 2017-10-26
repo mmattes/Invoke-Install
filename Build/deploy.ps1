@@ -2,11 +2,6 @@
 $SourcePath = $PSScriptRoot + "\..\Source\Invoke-Install"
 $ManifestPath = $SourcePath + "\Invoke-Install.psd1"
 
-$ENV:Path += ";$ENV:ProgramFiles\Git\cmd"
-Import-Module Posh-Git -ErrorAction Stop
-
-git pull
-
 # Start by importing the manifest to determine the version, then add 1 to the revision
 $Manifest = Test-ModuleManifest -Path $ManifestPath
 [System.Version]$Version = $Manifest.Version
@@ -23,12 +18,12 @@ Try
 {
     # Set up a path to the git.exe cmd, import posh-git to give us control over git, and then push changes to GitHub
     # Note that "update version" is included in the appveyor.yml file's "skip a build" regex to avoid a loop
-    
-    git checkout master
+    $ENV:Path += ";$ENV:ProgramFiles\Git\cmd"
+    Import-Module Posh-Git -ErrorAction Stop    
     git add --all
     git status
     git commit -s -m "Update version to $NewVersion"
-    git push origin master
+    git push origin/master master
     Write-Host "PowerShell Module version $NewVersion published to GitHub." -ForegroundColor Cyan
 }
 Catch 
