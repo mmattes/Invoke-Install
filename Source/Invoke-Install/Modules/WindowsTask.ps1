@@ -111,15 +111,12 @@ function Remove-WindowsTask
     param(        
         [Parameter(Mandatory=$true, Position=1)]
         [string]$TaskName   = $null,
-
-        [Parameter(Mandatory=$true, Position=2)]
-        [string]$BinaryPath = $null,
         
-        [Parameter(Mandatory=$false, Position=3)]
+        [Parameter(Mandatory=$false, Position=2)]
         [string]$TaskPath    = $null,
 
-        [Parameter(Mandatory=$false, Position=4)]
-        [string]$host       = $null
+        [Parameter(Mandatory=$false, Position=3)]
+        [string]$Host       = $null
     )
     
     Begin {     
