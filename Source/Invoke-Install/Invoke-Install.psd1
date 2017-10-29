@@ -69,7 +69,24 @@ PowerShellVersion = '5.0'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @("Invoke-Install", "Remove-Directory", )
+FunctionsToExport = @("Invoke-Install", 
+                        "Remove-Directory",
+                        "New-WindowsTask",
+                        "Remove-WindowsTask",
+                        "Stop-WindowsService",
+                        "Remove-WindowsService",
+                        "New-WindowsService",
+                        "Start-WindowsService",
+                        "New-NSSMService",
+                        "Remove-NSSMService",
+                        "Set-NSSMAppDirectory",
+                        "Start-NSSMService",
+                        "Stop-NSSMService",
+                        "New-IISWebsite",
+                        "Remove-IISWebsite",
+                        "New-IISApplicationPool",
+                        "Remove-IISApplicationPool",
+                        "Stop-IISAppPool")
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
