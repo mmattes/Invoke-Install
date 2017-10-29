@@ -5,21 +5,14 @@ function Invoke-Install (
     [Parameter(Position=0, Mandatory=$true, HelpMessage="Path to the *.install.ps1")]
     [string] $InstallFilePath,
 
-    [string] $Filter =  ".*\.install\.ps1",
-
-    [string] $RunParallel =  $false
+    [string] $Filter =  ".*\.install\.ps1"
 ) {
     $InstallScripts = Get-InstallScripts -InstallFilePath $InstallFilePath -Filter $Filter
 
     $Count = 0 
 
     foreach ($Script in $InstallScripts) {
-        if (!($RunParallel)) {
-            Use-InvokeParallel
-            Invoke-Parallel -ImportVariables -ScriptBlock { . $Script }
-        } else {
-            . $Script
-        }
+        . $Script
         $Count += 1
     }
 
@@ -53,17 +46,4 @@ function Get-InstallScripts (
         return $InstallScripts
     }
 
-}
-
-function Use-InvokeParallel () {
- #   if (!(Get-Module -ListAvailable -Name Invoke-Parallel)) {
-  #      Install-Module /home/markus/projekte/Invoke-Parallel/Invoke-Parallel/Invoke-Parallel.psd1 -Force -ErrorAction Stop 
-        # Install-Module Invoke-Parallel -Force -ErrorAction Stop 
-  #  } 
-    
-    if (!(Get-Module Invoke-Parallel))
-    {        
-        Import-Module /home/markus/projekte/Invoke-Parallel/Invoke-Parallel/Invoke-Parallel.psd1 -ErrorAction Stop
-        # Import-Module Invoke-Parallel -ErrorAction Stop
-    } 
 }
