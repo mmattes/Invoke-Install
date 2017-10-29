@@ -9,7 +9,7 @@ Write-Output "Old Version: $Version"
 [String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, ($Version.Build+1), 0)
 Write-Output "New Version: $NewVersion"
 
-Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion -FunctionsToExport '*'
+Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion
 
 Publish-Module -Path $SourcePath -NuGetApiKey $ENV:NuGetApiKey -Verbose -ErrorAction Stop
 
@@ -19,7 +19,7 @@ Try
     # Set up a path to the git.exe cmd, import posh-git to give us control over git, and then push changes to GitHub
     # Note that "update version" is included in the appveyor.yml file's "skip a build" regex to avoid a loop
     $ENV:Path += ";$ENV:ProgramFiles\Git\cmd"
-    Import-Module Posh-Git -ErrorAction Stop    
+    Import-Module Posh-Git -ErrorAction Stop
     git checkout master
     git add --all
     git status
