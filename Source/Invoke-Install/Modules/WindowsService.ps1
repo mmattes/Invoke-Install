@@ -137,9 +137,6 @@ function New-WindowsService
         }
         
         Write-Log "Installation completed: $ServiceName"
-
-        Start-WindowsService
-        Assert-ServicesStarted
     }
     
     End {
@@ -174,6 +171,7 @@ function Assert-ServiceExists {
 function Start-WindowsService()
 {
     Get-Service -Name $serviceName | Set-Service -Status Running
+    Assert-ServicesStarted
 }
 
 function Assert-ServicesStarted () 
