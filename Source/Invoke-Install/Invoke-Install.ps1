@@ -18,9 +18,7 @@ function Invoke-Install (
             Use-InvokeParallel
             Invoke-Parallel -ImportVariables -ScriptBlock { . $Script }
         } else {
-            foreach ($Script in $InstallScripts) {
-                . $Script
-            }        
+            . $Script
         }
         $Count += 1
     }
