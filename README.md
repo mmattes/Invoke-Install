@@ -1,6 +1,6 @@
 # Invoke-Install
 
-[![Build status](https://ci.appveyor.com/api/projects/status/ya5gqksgxcbkhrvr?svg=true)](https://ci.appveyor.com/project/mmattes/invoke-install)
+[![Build status](https://ci.appveyor.com/api/projects/status/vjynfakil886epi1/branch/master?svg=true)](https://ci.appveyor.com/project/mmattes/invoke-install/branch/master)
 
 Module to simplify PowerShell installations
 

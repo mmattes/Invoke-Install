@@ -28,7 +28,7 @@ function New-WindowsTask
         [string]$User        = $null,
         
         [Parameter(Mandatory=$false, Position=7)]
-        [string]$Password    = $null,
+        [securestring]$SecurePassword    = $null,
 
         # TODO: Improve that, this is not plain simple
         [Parameter(Mandatory=$false, Position=8)]
@@ -40,57 +40,62 @@ function New-WindowsTask
         # PRIVATE FUNCTIONS
         function New-ScheduledTaskFolder
         {
-            $errorActionPreference = "stop"
+            $ErrorActionPreference = "stop"
             
-            $scheduleObject = New-Object -ComObject schedule.service
+            $ScheduleObject = New-Object -ComObject schedule.service
             
-            $scheduleObject.connect()
+            $ScheduleObject.connect()
             
-            $rootFolder = $scheduleObject.GetFolder("\")
+            $RootFolder = $ScheduleObject.GetFolder("\")
             
             try
             {
-                $null = $scheduleObject.GetFolder($TaskPath)
+                $null = $ScheduleObject.GetFolder($TaskPath)
             }
             catch
             {
-                $null = $rootFolder.CreateFolder($TaskPath)
+                $null = $RootFolder.CreateFolder($TaskPath)
             }
             finally
             {
-                $errorActionPreference = "continue"
+                $ErrorActionPreference = "continue"
             }
         }
     }
     
     Process {
-        Write-Log "Installing Windows Task: $taskName"
+        Write-Log "Installing Windows Task: $TaskName"
                 
         New-ScheduledTaskFolder
         
-        $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType S4U -RunLevel Highest
+        $Principal = New-ScheduledTaskPrincipal -UserId $User -LogonType S4U -RunLevel Highest
         
-        $inputObject = New-ScheduledTask -Action $action `
-                                         -Trigger $trigger `
-                                         -Principal $principal `
-                                         -Settings $settings `
-                                         -Description $description
+        $InputObject = New-ScheduledTask -Action $Action `
+                                         -Trigger $Trigger `
+                                         -Principal $Principal `
+                                         -Settings $Settings `
+                                         -Description $Description
 
                                          
-        if([string]::IsNullOrEmpty($password))
+        if([string]::IsNullOrEmpty($Password))
         {
-            Register-ScheduledTask -TaskName    $taskName `
-                                   -TaskPath    $taskPath `
-                                   -InputObject $inputObject `
-                                   -User        $user
+            Register-ScheduledTask -TaskName    $TaskName `
+                                   -TaskPath    $TaskPath `
+                                   -InputObject $InputObject `
+                                   -User        $User
         }
         else
         {
-            Register-ScheduledTask -TaskName    $taskName `
-                                   -TaskPath    $taskPath `
-                                   -InputObject $inputObject `
-                                   -User        $user `
-                                   -Password    $password
+            # Register-ScheduledTask does not accept
+            
+            $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $UserName, $SecurePassword
+            $Password = $Credentials.GetNetworkCredential().Password 
+
+            Register-ScheduledTask -TaskName    $TaskName `
+                                   -TaskPath    $TaskPath `
+                                   -InputObject $InputObject `
+                                   -User        $User `
+                                   -Password    $Password
         }
     }
     
@@ -106,15 +111,12 @@ function Remove-WindowsTask
     param(        
         [Parameter(Mandatory=$true, Position=1)]
         [string]$TaskName   = $null,
-
-        [Parameter(Mandatory=$true, Position=2)]
-        [string]$BinaryPath = $null,
         
-        [Parameter(Mandatory=$false, Position=3)]
+        [Parameter(Mandatory=$false, Position=2)]
         [string]$TaskPath    = $null,
 
-        [Parameter(Mandatory=$false, Position=4)]
-        [string]$host       = $null
+        [Parameter(Mandatory=$false, Position=3)]
+        [string]$Host       = $null
     )
     
     Begin {     
