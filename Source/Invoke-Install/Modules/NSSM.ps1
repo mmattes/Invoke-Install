@@ -1,8 +1,30 @@
-<#
-    Creates an Non-Sucking Service Manager Service
-#>
 function New-NSSMService
 {
+     <#
+        .SYNOPSIS
+            Creates a new service using the None-Sucking Service Manager
+        
+        .DESCRIPTION
+            Some binaries for example node are not built that they can be run as a service in Windows
+            By using a tool like the None-Sucking Service Manager which will wrap around them 
+            you can still get the binary running as a service. 
+
+        .PARAMETER ServiceName
+            Name of the service under which it will be listed
+
+        .PARAMETER ServiceBinaryPath
+            Path to the binary which should be run as a service
+
+        .PARAMETER ServiceArgs
+            Arguments which should be past to the ServiceBinary
+
+        .PARAMETER NSSMBinaryPath
+            Path to the nssm.exe which is needed to run the binary as a service
+            
+        .EXAMPLE
+            New-NSSMService -ServiceName "MyService" -ServiceBinaryPath "C:\MyService.exe" -NSSMBinaryPath "C:\nssm.exe"
+            New-NSSMService -ServiceName "MyService" -ServiceBinaryPath "C:\MyService.exe" -ServiceArgs "-silent" -NSSMBinaryPath "C:\nssm.exe"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $ServiceName     = $null,
@@ -10,7 +32,7 @@ function New-NSSMService
         [Parameter(Mandatory=$true, Position=2)]
         [string]  $ServiceBinaryPath     = $null,
 
-        [Parameter(Mandatory=$true, Position=3)]
+        [Parameter(Mandatory=$false, Position=3)]
         [string]  $ServiceArgs     = $null,
 
         [Parameter(Mandatory=$true, Position=4)]
@@ -30,11 +52,24 @@ function New-NSSMService
     }
 }
 
-<#
-    Removes an Non-Sucking Service Manager Service
-#>
 function Remove-NSSMService
 {
+     <#
+        .SYNOPSIS
+            Removes a service which got installed by using the None-Sucking Service Manager
+        
+        .DESCRIPTION
+            Removes a service which got installed by using the None-Sucking Service Manager
+
+        .PARAMETER ServiceName
+            Name of the service under which it will be removed
+
+        .PARAMETER NSSMBinaryPath
+            Path to the nssm.exe which is needed to run the binary as a service
+            
+        .EXAMPLE
+            Remove-NSSMService -ServiceName "MyService" -NSSMBinaryPath "C:\nssm.exe"            
+    #>
     Param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $ServiceName     = $null,
@@ -56,11 +91,27 @@ function Remove-NSSMService
     }
 }
 
-<#
-    Set Non-Sucking Service Manager Parameter AppDirectory
-#>
 function Set-NSSMAppDirectory
 {
+    <#
+        .SYNOPSIS
+            Sets the parameter AppDirectory for a service installed by the None-Sucking Service Manager
+        
+        .DESCRIPTION
+            Sets the parameter AppDirectory for a service installed by the None-Sucking Service Manager
+
+        .PARAMETER ServiceName
+            Name of the service for which we will set the AppDirectory parameter
+
+        .PARAMETER AppDirectory
+            The applications working directory
+        
+        .PARAMETER NSSMBinaryPath
+            Path to the nssm.exe which is needed to run the binary as a service
+
+        .EXAMPLE
+            Set-NSSMAppDirectory -ServiceName "MyService" -AppDirectory "C:\MyServiceRunsHere" -NSSMBinaryPath "C:\nssm.exe"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $ServiceName     = $null,
@@ -84,11 +135,25 @@ function Set-NSSMAppDirectory
     }
 }
 
-<#
-    Starts an Non-Sucking Service Manager Service
-#>
+
 function Start-NSSMService
 {
+    <#
+        .SYNOPSIS
+            Starts a Service which is run by the None-Sucking Service Manager
+        
+        .DESCRIPTION
+            Starts a Service which is run by the None-Sucking Service Manager
+
+        .PARAMETER ServiceName
+            Name of the service to be started by using the None-Sucking Service Manager
+               
+        .PARAMETER NSSMBinaryPath
+            Path to the nssm.exe which is needed to start the service
+
+        .EXAMPLE
+            Start-NSSMService -ServiceName "MyService" -NSSMBinaryPath "C:\nssm.exe"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $ServiceName     = $null,
@@ -110,11 +175,24 @@ function Start-NSSMService
     }
 }
 
-<#
-    Stops an Non-Sucking Service Manager Service
-#>
 function Stop-NSSMService
 {
+    <#
+        .SYNOPSIS
+            Stops a Service which is run by the None-Sucking Service Manager
+        
+        .DESCRIPTION
+            Stops a Service which is run by the None-Sucking Service Manager
+
+        .PARAMETER ServiceName
+            Name of the service to be stopped by using the None-Sucking Service Manager
+               
+        .PARAMETER NSSMBinaryPath
+            Path to the nssm.exe which is needed to stop the service
+
+        .EXAMPLE
+            Stop-NSSMService -ServiceName "MyService" -NSSMBinaryPath "C:\nssm.exe"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $ServiceName     = $null,
