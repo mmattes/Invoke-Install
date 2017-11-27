@@ -91,9 +91,9 @@ function New-WindowsService
     )
     
     Begin {
-        if ((Test-Path $ServicePath) -eq $false)
+        if ((Test-Path $BinaryPath) -eq $false)
         {
-            Write-Log "Service binary path not found: $ServicePath. Service was NOT installed." -LogLevel Error
+            Write-Log "Service binary path not found: $BinaryPath. Service was NOT installed." -LogLevel Error
         }
     }
     
