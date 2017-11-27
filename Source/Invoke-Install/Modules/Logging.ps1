@@ -1,5 +1,23 @@
 function Write-Log 
 { 
+    <#
+        .SYNOPSIS
+            Log Message with given level, default level is "Information"
+        
+        .DESCRIPTION
+            Log Message with given level, default level is "Information"
+
+        .PARAMETER Message
+            Message to be logged
+
+        .PARAMETER LogLevel
+            Possible values are 'Error', 'Warning', 'Information', 'Verbose', 'Debug'
+
+        .EXAMPLE
+            Write-Log "Everything went ok!" -LogLevel Information
+            Write-Log "Result is $Result" -LogLevel Debug
+            Write-Log "Could not stop service" -LogLevel Error
+    #>
     [CmdletBinding()] 
     Param(
         [Parameter(Mandatory=$true, Position=0)]

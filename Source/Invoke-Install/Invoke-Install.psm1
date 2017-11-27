@@ -1,5 +1,3 @@
-# TODO: Propper Description of this file above
-
 # Import all *.ps1 Files
 $Modules = Get-ChildItem -Recurse -Path $PSScriptRoot -Filter *.ps1 
 

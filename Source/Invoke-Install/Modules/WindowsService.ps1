@@ -91,9 +91,9 @@ function New-WindowsService
     )
     
     Begin {
-        if ((Test-Path $ServicePath) -eq $false)
+        if ((Test-Path $BinaryPath) -eq $false)
         {
-            Write-Log "Service binary path not found: $ServicePath. Service was NOT installed." -LogLevel Error
+            Write-Log "Service binary path not found: $BinaryPath. Service was NOT installed." -LogLevel Error
         }
     }
     
@@ -140,9 +140,6 @@ function New-WindowsService
         }
         
         Write-Log "Installation completed: $ServiceName"
-
-        Start-WindowsService
-        Assert-ServicesStarted
     }
     
     End {
@@ -177,6 +174,7 @@ function Assert-ServiceExists {
 function Start-WindowsService()
 {
     Get-Service -Name $serviceName | Set-Service -Status Running
+    Assert-ServicesStarted
 }
 
 function Assert-ServicesStarted () 

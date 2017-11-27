@@ -242,6 +242,10 @@ function Stop-IISAppPool
 }
 
 function Use-WebAdministration () {
+    if (!(Get-Module -ListAvailable -Name WebAdministration)) {
+        throw "WebAdministration Module not available, please install IIS Powershell Snap-in"
+    } 
+
     if (!(Get-Module WebAdministration))
     {
         ## Load it nested, and we'll automatically remove it during clean up.

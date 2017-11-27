@@ -24,6 +24,9 @@ os: WMF 5
 
 build: false
 
+# test_script:
+#  - ps: Invoke-Pester -Path ".\Tests" -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru
+
 # Install NuGet to interact with the PowerShell Gallery
 install:
 - ps: |
