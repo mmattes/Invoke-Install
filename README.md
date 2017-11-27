@@ -58,5 +58,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Inspiration 
     * [PSDeploy](https://github.com/RamblingCookieMonster/PSDeploy)
     * [InvokeBuild](https://github.com/nightroman/Invoke-Build)
-* This Module uses
-    * [Invoke-Parallel](https://github.com/RamblingCookieMonster/Invoke-Parallel)
