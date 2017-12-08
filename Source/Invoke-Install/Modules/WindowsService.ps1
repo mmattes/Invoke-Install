@@ -16,11 +16,16 @@ function Stop-WindowsService
     
     Process {
         # Verify if the service exists, and if yes stop it and wait for new state.
-        if(Assert-ServiceExists $Name) {
-            # Stop Service
-            Write-Log "Stop Service: $Name`n"
-            
-            Get-Service $Name | Where-Object {$_.status -eq 'Running'} | Stop-Service -Pass
+        if(Assert-ServiceExists $Name) {            
+            $Service = Get-Service $Name | Where-Object {$_.status -eq 'Running'}
+
+            if ($Service) {
+                Write-Log "Stop Service: $Name`n"
+                $Service | Stop-Service -Pass
+            } 
+            else {
+                Write-Log "Service $Name not Running`n"
+            }
 
             Start-Sleep -s $Sleep
         }
@@ -87,7 +92,7 @@ function New-WindowsService
         [string]$User       = $null, # NT AUTHORITY\LocalSystem, NT AUTHORITY\LocalService, NT AUTHORITY\NetworkService, <Domain\User>
 
         [Parameter(Mandatory=$false, Position=8)]
-        [securestring]$SecurePassword    = $null
+        [string]$Password    = $null
     )
     
     Begin {
@@ -120,9 +125,7 @@ function New-WindowsService
             # if password is empty, create a dummy one to allow having credentials for system accounts:
             # NT AUTHORITY\LocalSystem
             # NT AUTHORITY\LocalService
-            # NT AUTHORITY\NetworkService
-            $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $User, $SecurePassword
-            $Password = $Credentials.GetNetworkCredential().Password 
+            # NT AUTHORITY\NetworkService            
 
             if ([string]::IsNullOrEmpty($Password)) {
                 $Password = "dummy"
