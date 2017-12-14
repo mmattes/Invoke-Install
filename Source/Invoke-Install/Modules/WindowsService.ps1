@@ -129,11 +129,7 @@ function New-WindowsService
 
             if ([string]::IsNullOrEmpty($Password)) {
                 $Password = "dummy"
-            }
-            else {
-                # Add account to logon as a service.
-                Add-AccountToLogonAsService $User
-            }
+            }            
             
             $Service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
             
