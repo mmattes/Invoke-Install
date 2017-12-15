@@ -129,7 +129,11 @@ function New-WindowsService
 
             if ([string]::IsNullOrEmpty($Password)) {
                 $Password = "dummy"
-            }            
+            }
+            else {
+                # Add account to logon as a service.
+                Add-AccountToLogonAsService $User
+            }
             
             $Service = Get-WmiObject -Class Win32_Service -Filter "name='$ServiceName'"
             
@@ -143,6 +147,100 @@ function New-WindowsService
     
     End {
     }
+}
+
+<#
+    Adds a Windows Account to LogonAsService
+#>
+function Add-AccountToLogonAsService {
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$Username = $null
+    )
+    
+    Begin {
+    }
+    
+    Process {
+        $sidstr = $null
+        
+        try {
+            $ntprincipal = new-object System.Security.Principal.NTAccount "$Username"
+            $sid = $ntprincipal.Translate([System.Security.Principal.SecurityIdentifier])
+            $sidstr = $sid.Value.ToString()
+        } catch {
+            $sidstr = $null
+        }
+        
+        Write-Log "Account: $($Username)"
+        
+        if([string]::IsNullOrEmpty($sidstr)) {
+            Write-Log "Account $Username not found!" -LogLevel "Error"
+            exit -1
+        }
+        
+        Write-Log "Account SID: $($sidstr)"        
+        
+        $tmp = [System.IO.Path]::GetTempFileName()
+        
+        Write-Log "Export current Local Security Policy"
+        
+        secedit.exe /export /cfg "$($tmp)"
+        
+        $c = Get-Content -Path $tmp
+        
+        $currentSetting = ""
+        
+        foreach($s in $c) {
+            if( $s -like "SeServiceLogonRight*") {
+                $x = $s.split("=",[System.StringSplitOptions]::RemoveEmptyEntries)
+                $currentSetting = $x[1].Trim()
+            }
+        }
+        
+        if( $currentSetting -notlike "*$($sidstr)*" ) {
+            Write-Log "Modify Setting ""Logon as a Service"""
+            
+            if( [string]::IsNullOrEmpty($currentSetting) ) {
+                $currentSetting = "*$($sidstr)"
+            } else {
+                $currentSetting = "*$($sidstr), $($currentSetting)"
+            }
+            
+            Write-Log "$currentSetting"
+            
+            $outfile = @"
+[Unicode]
+Unicode=yes
+[Version]
+signature="`$CHICAGO`$"
+Revision=1
+[Privilege Rights]
+SeServiceLogonRight = $($currentSetting)
+"@
+        
+            $tmp2 = [System.IO.Path]::GetTempFileName()
+            
+            
+            Write-Log "Import new settings to Local Security Policy"
+            $outfile | Set-Content -Path $tmp2 -Encoding Unicode -Force
+            
+            #notepad.exe $tmp2
+            Push-Location (Split-Path $tmp2)
+            
+            try {
+                secedit.exe /configure /db "secedit.sdb" /cfg "$($tmp2)" /areas USER_RIGHTS 
+            } finally {
+                Pop-Location
+            }
+        } else {
+            Write-Log "NO ACTIONS REQUIRED! Account already in ""Logon as a Service"""
+        }
+        
+        Write-Log "Done."
+    }
+    
+    end {}
 }
 
 <# 
