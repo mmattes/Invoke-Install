@@ -92,7 +92,7 @@ function New-IISApplicationPool
         
                 $IdentityType          = $null,
         [string]$User                  = $null,
-        [SecureString] $SecurePassword              = $null,
+        [string]$Password              = $null,
         [bool]  $LoadUserProfile       = $true
     )
     
@@ -125,10 +125,6 @@ function New-IISApplicationPool
                     Write-Log "Setting AppPool to run as $User"
                     
                     $Pool.processmodel.username = $User
-
-                    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $User, $SecurePassword
-                    $Password = $Credentials.GetNetworkCredential().Password 
-
                     $Pool.processmodel.password = $Password
                 }
             }
