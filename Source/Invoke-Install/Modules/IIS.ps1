@@ -47,10 +47,7 @@ function Remove-IISWebsite
 {
     param(                
         [Parameter(Mandatory=$true, Position=1)]
-        [string]$name    = $null,
-
-        [Parameter(Mandatory=$true, Position=2)]
-        [string]$root    = $null
+        [string]$name    = $null
     )
     
     Begin {
