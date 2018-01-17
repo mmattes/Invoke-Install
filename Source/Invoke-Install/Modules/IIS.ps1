@@ -29,7 +29,8 @@ function New-IISWebsite
         }
         else
         {
-            New-Item $iisSite -Type Site -PhysicalPath $root
+            # New-Item is not possible without a Binding, we add one here, you need to remove it later on
+            New-Item $iisSite -Type Site -PhysicalPath $root -Bindings @{protocol='http';bindingInformation=':80:'}
         }
         
         Set-ItemProperty $iisSite -Name ApplicationPool -Value $appPool
