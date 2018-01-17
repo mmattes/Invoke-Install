@@ -51,7 +51,7 @@ function Remove-WindowsService
     Process {
         # Verify if the service already exists, and if yes remove it
         if(Assert-ServiceExists $ServiceName) {
-            if(Assert-ServicesStarted) {
+            if(!Assert-ServiceStopped) {
                 Stop-WindowsService -Name $ServiceName
             }          
             
@@ -287,5 +287,19 @@ function Assert-ServicesStarted ()
     } 
     else {
         return $true
+    }
+}
+
+function Assert-ServiceStopped()
+{
+    Start-Sleep -s 5
+    
+    $SmokeTestService = Get-Service -Name $serviceName
+    
+    if ($SmokeTestService.Status -ne "Stopped") {
+        return $false
+    } 
+    else {
+        return $true  
     }
 }
