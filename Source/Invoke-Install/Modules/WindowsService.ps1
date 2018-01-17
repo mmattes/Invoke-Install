@@ -51,7 +51,7 @@ function Remove-WindowsService
     Process {
         # Verify if the service already exists, and if yes remove it
         if(Assert-ServiceExists $ServiceName) {
-            if(!Assert-ServiceStopped) {
+            if(-Not (Assert-ServiceStopped)) {
                 Stop-WindowsService -Name $ServiceName
             }          
             
