@@ -47,10 +47,7 @@ function Remove-IISWebsite
 {
     param(                
         [Parameter(Mandatory=$true, Position=1)]
-        [string]$name    = $null,
-
-        [Parameter(Mandatory=$true, Position=2)]
-        [string]$root    = $null
+        [string]$name    = $null
     )
     
     Begin {
@@ -92,7 +89,7 @@ function New-IISApplicationPool
         
                 $IdentityType          = $null,
         [string]$User                  = $null,
-        [SecureString] $SecurePassword              = $null,
+        [string]$Password              = $null,
         [bool]  $LoadUserProfile       = $true
     )
     
@@ -125,10 +122,6 @@ function New-IISApplicationPool
                     Write-Log "Setting AppPool to run as $User"
                     
                     $Pool.processmodel.username = $User
-
-                    $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList $User, $SecurePassword
-                    $Password = $Credentials.GetNetworkCredential().Password 
-
                     $Pool.processmodel.password = $Password
                 }
             }

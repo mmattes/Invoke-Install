@@ -51,7 +51,9 @@ function Remove-WindowsService
     Process {
         # Verify if the service already exists, and if yes remove it
         if(Assert-ServiceExists $ServiceName) {
-            Stop-WindowsService -Name $ServiceName
+            if(Assert-ServicesStarted) {
+                Stop-WindowsService -Name $ServiceName
+            }          
             
             # Remove Service
             Start-Process -FilePath sc.exe -Args "delete $ServiceName" -Verb runAs -Wait
@@ -284,5 +286,6 @@ function Assert-ServicesStarted ()
         Throw "Smoke test: FAILED. (SERVICE FAILED TO START)"
     } 
     else {
+        return $true
     }
 }
