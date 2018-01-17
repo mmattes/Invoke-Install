@@ -23,7 +23,7 @@ function New-IISWebsite
     Process {
         Write-Log "Creating IIS Website: $name"
         
-        if($bindings -ne $null)
+        if(!$bindings)
         {
             New-Item $iisSite -Type Site -Bindings $bindings -PhysicalPath $root
         }
