@@ -88,7 +88,7 @@ function New-IISApplicationPool
         [string]$IdleTimeout           = $null,
         [string]$PeriodicRestartTime   = $null,
         
-                $IdentityType          = $null,
+                $IdentityType          = $null, # 0 = LocalSystem, 1 = LocalService, 2 = NetworkService, 3 = SpecificUser, 4 = ApplicationPoolIdentity
         [string]$User                  = $null,
         [string]$Password              = $null,
         [bool]  $LoadUserProfile       = $true
