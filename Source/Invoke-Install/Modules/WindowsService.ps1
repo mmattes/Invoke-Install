@@ -167,6 +167,8 @@ function Add-AccountToLogonAsService {
         $sidstr = $null
         
         try {
+            # in case somone is using a local account like .\FooBar the .\ will not work and will get replaced
+            $Username = $Username -replace "\.\\", ""
             $ntprincipal = new-object System.Security.Principal.NTAccount "$Username"
             $sid = $ntprincipal.Translate([System.Security.Principal.SecurityIdentifier])
             $sidstr = $sid.Value.ToString()
