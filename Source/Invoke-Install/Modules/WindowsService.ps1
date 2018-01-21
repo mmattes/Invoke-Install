@@ -1,8 +1,21 @@
-<#
-    Stops the given Windows Service and waits for 5 seconds.
-#>
 function Stop-WindowsService
 {
+    <#
+        .SYNOPSIS
+            Stops a Windows Service
+        
+        .DESCRIPTION
+            Stops a Windows Service
+
+        .PARAMETER Name
+            Name of the Service to stop
+               
+        .PARAMETER Sleep
+            Seconds to wait after the Stop service command was executed
+
+        .EXAMPLE
+            Stop-WindowsService -Name "MyService" -Sleep 10
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]$Name  = $null,
@@ -35,11 +48,21 @@ function Stop-WindowsService
     }
 }
 
-<#
-    Removes the given Windows Service.
-#>
 function Remove-WindowsService
 {
+    <#
+        .SYNOPSIS
+            Removes a Windows Service
+        
+        .DESCRIPTION
+            Removes a Windows Service
+
+        .PARAMETER ServiceName
+            Name of the Service to remove
+
+        .EXAMPLE
+            Remove-WindowsService -Name "MyService"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]$ServiceName = $null
@@ -66,16 +89,68 @@ function Remove-WindowsService
     }
 }
 
-<#
-    Creates a Windows Service and sets the configuration.
-#>
 function New-WindowsService
 {
+    <#
+        .SYNOPSIS
+            Creates a Windows Service
+        
+        .DESCRIPTION
+            Creates a Windows Service
+
+        .PARAMETER ServiceName
+            Name of the Service to create
+
+        .PARAMETER DisplayName
+            Name under which the Service will be displayed in the windows servcies list
+            
+            Default:
+            Same as ServiceName
+
+        .PARAMETER BinaryPath
+            Path to the service binary
+
+        .PARAMETER Description
+            Desciption of the service 
+
+        .PARAMETER StartUpType
+            Possible values:
+            Automatic
+            Manual
+            Disabled
+
+        .PARAMETER DelayedStart
+            If StartUpType is Automatic and DelayedStart is true then the service will be set to automatic (delayed start)
+            Default = false
+
+        .PARAMETER User
+            Specifies the user under which the service should be started 
+            
+            Possible values:
+            "NT AUTHORITY\LocalSystem"
+            "NT AUTHORITY\LocalService"
+            "NT AUTHORITY\NetworkService"
+            <.\User>
+            <Domain\User>
+
+            Default: 
+            "NT AUTHORITY\LocalSystem"
+
+        .PARAMETER Password
+            Specifies teh password of the user under which the service should be started, only needed if a specific local or
+            domain user is used
+
+        .EXAMPLE
+            New-WindowsService -ServiceName "MyService" -DisplayName "Company.MyService" -BinaryPath "C:\MyService\myservice.exe"
+
+        .EXAMPLE
+            New-WindowsService -ServiceName "MyService" -BinaryPath "C:\MyService\myservice.exe" -User ".\MyUser" -Password "MyPassword"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]$ServiceName = $null,
 
-        [Parameter(Mandatory=$true, Position=2)]
+        [Parameter(Mandatory=$false, Position=2)]
         [string]$DisplayName = $null,
 
         [Parameter(Mandatory=$true, Position=3)]
@@ -85,10 +160,10 @@ function New-WindowsService
         [string]$Description = $null,
 
         [Parameter(Mandatory=$false, Position=5)]
-        [string]$StartUpType = $null, # Automatic, Manual, Disabled
+        [string]$StartUpType = $null,
 
         [Parameter(Mandatory=$false, Position=6)]
-        [string]$DelayedStart= $null, # DelayedAutoStart
+        [bool]$DelayedStart= $false,
 
         [Parameter(Mandatory=$false, Position=7)]
         [string]$User       = $null, # NT AUTHORITY\LocalSystem, NT AUTHORITY\LocalService, NT AUTHORITY\NetworkService, <Domain\User>
@@ -107,8 +182,11 @@ function New-WindowsService
     Process {
         Write-Log "Installing service: $serviceName`n"
         
-        # Install dotNET Service.
+        if (-Not($DisplayName)) {
+            $DisplayName = $ServiceName
+        }
         
+        # Install dotNET Service.
         New-Service -BinaryPathName $BinaryPath -Name $ServiceName -DisplayName $DisplayName
                     
         if($Description) {
@@ -151,9 +229,7 @@ function New-WindowsService
     }
 }
 
-<#
-    Adds a Windows Account to LogonAsService
-#>
+
 function Add-AccountToLogonAsService {
     param(
         [Parameter(Mandatory=$true, Position=1)]
@@ -247,11 +323,21 @@ SeServiceLogonRight = $($currentSetting)
     end {}
 }
 
-<# 
-    Determines if a Service exists with a name as defined in $serviceName.
-    Returns a boolean $True or $false.
-#> 
 function Assert-ServiceExists {
+    <#
+        .SYNOPSIS
+            Verifies that a Service exists
+        
+        .DESCRIPTION
+            Verifies that a Service exists, this is needed for some functions which will only run if the 
+            service is already installed
+
+        .PARAMETER Name
+            Name of the Service to verify existance of
+        
+        .EXAMPLE
+            Assert-ServiceExists -Name "MyService"
+    #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string] $Name
@@ -269,17 +355,42 @@ function Assert-ServiceExists {
     return $false
 }
 
-<# 
-    Starts the given Windows Service and waits for the service to reach the Stopped state or a maximum of 2 minutes seconds.
-#> 
-function Start-WindowsService()
+function Start-WindowsService
 {
-    Get-Service -Name $serviceName | Set-Service -Status Running
+    <#
+        .SYNOPSIS
+            Starts a windows service
+        
+        .DESCRIPTION
+            Starts a windows service
+            
+
+        .PARAMETER Name
+            Name of the Service to be started
+        
+        .EXAMPLE
+            Start-WindowsService -Name "MyService"
+    #>
+    param(
+        [Parameter(Mandatory = $true, Position = 1)]
+        [string] $Name
+    )
+    Get-Service -Name $Name | Set-Service -Status Running
     Assert-ServicesStarted
 }
 
 function Assert-ServicesStarted () 
 {
+    <#
+        .SYNOPSIS
+            Verifies that a Service is started
+        
+        .DESCRIPTION
+            Verifies that a Service is started
+
+        .EXAMPLE
+            Assert-ServicesStarted -Name "MyService"
+    #>
     Start-Sleep -s 5
     
     $SmokeTestService = Get-Service -Name $serviceName
@@ -292,8 +403,19 @@ function Assert-ServicesStarted ()
     }
 }
 
-function Assert-ServiceStopped()
+function Assert-ServiceStopped
 {
+    <#
+        .SYNOPSIS
+            Verifies that a Service is stopped
+        
+        .DESCRIPTION
+            Verifies that a Service is stopped
+
+        .EXAMPLE
+            Assert-ServiceStopped -Name "MyService"
+    #>
+
     Start-Sleep -s 5
     
     $SmokeTestService = Get-Service -Name $serviceName
