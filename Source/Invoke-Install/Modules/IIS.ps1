@@ -1,8 +1,41 @@
-<#
-    Creates an IIS website and sets the configuration
-#>
 function New-IISWebsite
 {
+    <#
+        .SYNOPSIS
+            Creates a new IIS website 
+        
+        .DESCRIPTION
+            Uses the PowerShell Web Administration SnapIn to creates a new IIS website 
+
+        .PARAMETER name
+            Name of the website to create in IIS
+
+        .PARAMETER root
+            Root path of the website
+
+        .PARAMETER appPool
+            Name of the AppPool to be created, use New-IISApplicationPool to create one. 
+            
+            Default = DefaultAppPool
+        
+        .PARAMETER bindings
+            The bindings for the website e.g. @{protocol='http';bindingInformation=':80:'}.
+            You can also leave this blank and use the WebAdministration to change the binding
+            after the website is created. Call Use-WebAdministration to make sure the WebAdministration
+            Module is loaded. 
+
+            Default = @{protocol='http';bindingInformation=':80:'}
+
+        .EXAMPLE
+            New-IISWebsite -name "MyWebsite" -root "C:\inetsrv\www"
+
+        .EXAMPLE
+            New-IISWebsite -name "MyWebsite" -root "C:\inetsrv\www" -bindings @{protocol='http';bindingInformation='*:80:www.mysite.com'}
+
+        .EXAMPLE
+            New-IISWebsite -name "MyWebsite" -root "C:\inetsrv\www" -appPool "MyAppPool" -bindings @{protocol='http';bindingInformation='192.168.100.55:80:www.mysite.com'}
+    #>
+
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $name     = $null,
@@ -40,12 +73,22 @@ function New-IISWebsite
     }
 }
 
-<#
-    Removes the IIS Website installation for the given site name.
-    The application pool gets only removed if the -appPoolName parameter is supplied.
-#>
 function Remove-IISWebsite
 {
+    <#
+        .SYNOPSIS
+            Removes a IIS website 
+        
+        .DESCRIPTION
+            Uses the PowerShell Web Administration SnapIn to remove a IIS website 
+
+        .PARAMETER name
+            Name of the website to remove in IIS
+        
+        .EXAMPLE
+            Remove-IISWebsite -name "MyWebsite"
+    #>
+
     param(                
         [Parameter(Mandatory=$true, Position=1)]
         [string]$name    = $null
@@ -71,11 +114,80 @@ function Remove-IISWebsite
     }
 }
 
-<#
-    Create an application pool an set the configuration.
-#>
+
 function New-IISApplicationPool
 {
+    <#
+        .SYNOPSIS
+            Creates a new IIS Application Pool
+        
+        .DESCRIPTION
+            Uses the PowerShell Web Administration SnapIn to create a new IIS Application Pool
+
+        .PARAMETER Name
+            Name of the Application Pool
+
+        .PARAMETER Enable32Bit
+            When true, enables a 32-bit application to run on a computer that runs a 64-bit version of Windows.
+
+            The default value is false
+
+        .PARAMETER StartMode
+            Specifies the startup type for the application pool.
+
+            Note: This attribute was added in IIS 7.5.
+
+            The startMode attribute can be one of the following possible values; the default value is OnDemand.
+
+            Possible values:
+            AlwaysRunning
+            OnDemand
+
+        .PARAMETER ManagedRuntimeVersion
+            Specifies the .NET Framework version to be used by the application pool.
+
+            The managedRuntimeVersion attribute can be one of the following possible values; the default value is "".
+
+            Possible values:
+            v1.1
+            v2.0
+            v4.0
+
+        .PARAMETER IdleTimeout
+            When these settings are configured, a worker process will shut down after a specified period of inactivity. 
+            The default value for idle time-out is 20 minutes.
+
+        .PARAMETER PeriodicRestartTime
+            The PeriodicRestartTime value contains configuration settings that allow you to control when an 
+            application pool is recycled.
+
+        .PARAMETER IdentityType
+            Possible values:
+            0 = LocalSystem 
+            1 = LocalService
+            2 = NetworkService
+            3 = SpecificUser
+            4 = ApplicationPoolIdentity
+
+        .PARAMETER User
+            Specifies the User under which the Application Pool should be running. Only needed if IdentityType is set to SpecificUser
+
+        .PARAMETER Password
+            Specifies the Password for the User under which the Application Pool should be running. Only needed if IdentityType is set to SpecificUser
+
+        .PARAMETER LoadUserProfile
+            Defines wether or not the Application Pool should load the user profile or not. Only needed if IdentityType is set to SpecificUser
+        
+        .EXAMPLE
+            New-IISApplicationPool -Name "MyAppPool"
+
+        .EXAMPLE
+            New-IISApplicationPool -Name "MyAppPool" -StartMode "AlwaysRunning" -IdentityType 4
+
+        .EXAMPLE
+            New-IISApplicationPool -Name "MyAppPool" -StartMode "AlwaysRunning" -IdentityType 3 -User ".\MyUser" -Passsword "MyPassword"
+    #>
+
     param(
         # Application Pool Settings
         [Parameter(Mandatory=$true, Position=1)]
@@ -83,12 +195,12 @@ function New-IISApplicationPool
         
         [bool]  $Enable32Bit           = $false,
         
-        [string]$StartMode             = $null, # AlwaysRunning, 
+        [string]$StartMode             = $null,
         [string]$ManagedRuntimeVersion = $null,
         [string]$IdleTimeout           = $null,
         [string]$PeriodicRestartTime   = $null,
         
-                $IdentityType          = $null, # 0 = LocalSystem, 1 = LocalService, 2 = NetworkService, 3 = SpecificUser, 4 = ApplicationPoolIdentity
+                $IdentityType          = $null,
         [string]$User                  = $null,
         [string]$Password              = $null,
         [bool]  $LoadUserProfile       = $true
@@ -154,11 +266,21 @@ function New-IISApplicationPool
     }
 }
 
-<#
-    Removes the IIS application pool for the given name.
-#>
 function Remove-IISApplicationPool
 {
+    <#
+        .SYNOPSIS
+            Removes an IIS Application Pool
+        
+        .DESCRIPTION
+            Uses the PowerShell Web Administration SnapIn to remove an IIS Application Pool
+
+        .PARAMETER name
+            Name of the IIS Application Pool to remove
+        
+        .EXAMPLE
+            Remove-IISApplicationPool -name "MyAppPool"
+    #>
     param(        
         # Application Pool Settings
         [Parameter(Mandatory=$true, Position=1)]
@@ -186,11 +308,26 @@ function Remove-IISApplicationPool
     }
 }
 
-<#
-    Stop the AppPool if it exists and is running, and throws no error if it doesn't.
-#>
+
 function Stop-IISAppPool
 {
+    <#
+        .SYNOPSIS
+            Stops an IIS Application Pool
+        
+        .DESCRIPTION
+            Uses the PowerShell Web Administration SnapIn to stopo an IIS Application Pool
+
+        .PARAMETER name
+            Name of the IIS Application Pool to stop
+
+        .PARAMETER sleep
+            Seconds to wait after the Pool stop command was send, this is sometimes needed 
+            as stopping an Application Pool can take time. 
+        
+        .EXAMPLE
+            Stop-IISAppPool -name "MyAppPool" -sleep 10
+    #>
     param(
         # Application Pool Settings
         [Parameter(Mandatory=$true, Position=1)]
@@ -236,8 +373,19 @@ function Stop-IISAppPool
 }
 
 function Use-WebAdministration () {
+    <#
+        .SYNOPSIS
+            Loads the WebAdministration Module if it is not already loaded
+        
+        .DESCRIPTION
+            Loads the WebAdministration Module if it is not already loaded
+        
+        .EXAMPLE
+            Use-WebAdministration
+    #>
+
     if (!(Get-Module -ListAvailable -Name WebAdministration)) {
-        throw "WebAdministration Module not available, please install IIS Powershell Snap-in"
+        throw "WebAdministration Module not available, please install IIS Powershell Snap-in, https://www.microsoft.com/en-us/download/details.aspx?id=7436 or https://www.microsoft.com/en-us/download/details.aspx?id=15488"
     } 
 
     if (!(Get-Module WebAdministration))
