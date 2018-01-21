@@ -1,4 +1,4 @@
-function Invoke-Install (
+function Invoke-Install {
      <#
         .SYNOPSIS
             Gets all *.install.ps1 and executes them
@@ -16,14 +16,15 @@ function Invoke-Install (
             Invoke-Install HelloWorld.install.ps1
 
         .EXAMPLE
-            Invoke-Install . -Filter ".*\.mynameing\.ps1"
+            Invoke-Install . -Filter ".*\.myfilter\.ps1"
     #>
+    param (
+        [Parameter(Position=0, Mandatory=$true, HelpMessage="Path to the *.install.ps1")]
+        [string] $Path,
 
-    [Parameter(Position=0, Mandatory=$true, HelpMessage="Path to the *.install.ps1")]
-    [string] $Path,
+        [string] $Filter =  ".*\.install\.ps1"
+    )
 
-    [string] $Filter =  ".*\.install\.ps1"
-) {
     $InstallScripts = Get-InstallScripts -Path $Path -Filter $Filter
 
     $Count = 0
@@ -36,7 +37,7 @@ function Invoke-Install (
     return $Count
 }
 
-function Get-InstallScripts (
+function Get-InstallScripts {
          <#
         .SYNOPSIS
             Gets all scripts within a specific folder which match the filter
@@ -54,13 +55,15 @@ function Get-InstallScripts (
             Get-InstallScripts .
 
         .EXAMPLE
-            Get-InstallScripts . -Filter ".*\.mynameing\.ps1"
+            Get-InstallScripts . -Filter ".*\.filter\.ps1"
     #>
-    [Parameter(Position=0, Mandatory=$true, HelpMessage="Path to the *.install.ps1")]
-    [string] $Path, 
+    param(
+        [Parameter(Position = 0, Mandatory = $true, HelpMessage = "Path to the *.install.ps1")]
+        [string] $Path, 
 
-    [string] $Filter
-) {
+        [string] $Filter
+    )    
+
     $InstallScripts = @()
     
     if ((Get-Item $Path) -is [System.IO.DirectoryInfo]) {
