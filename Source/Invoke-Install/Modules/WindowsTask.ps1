@@ -1,3 +1,5 @@
+function New-WindowsTask
+{
     <#
         .SYNOPSIS
             Creates a new Windows Task
@@ -29,8 +31,7 @@
         .EXAMPLE
             New-WindowsTask -TaskName "MyTask" -TaskPath "MyPath/MyTasks" -Action -Trigger
     #>
-function New-WindowsTask
-{
+    
     param(        
         [Parameter(Mandatory=$true, Position=1)]
         [string] $TaskName    = $null,
@@ -128,6 +129,9 @@ function New-WindowsTask
     }
 }
 
+    
+function Remove-WindowsTask
+{
     <#
         .SYNOPSIS
             Removes a Windows Task
@@ -147,8 +151,6 @@ function New-WindowsTask
         .EXAMPLE
             New-WindowsTask -TaskName "MyTask" -TaskPath "MyPath/MyTasks" -Action -Trigger
     #>
-function Remove-WindowsTask
-{
     param(        
         [Parameter(Mandatory=$true, Position=1)]
         [string ]$TaskName   = $null,
