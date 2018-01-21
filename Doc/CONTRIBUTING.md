@@ -9,7 +9,7 @@ merged.
 How to contribute
 -----------------
 
-The preferred workflow for contributing to pydicom is to fork the
+The preferred workflow for contributing to Invoke-Install is to fork the
 [develop repository](https://github.com/mmattes/Invoke-Install) on
 GitHub, clone, and develop on a branch. Steps:
 
@@ -18,7 +18,7 @@ GitHub, clone, and develop on a branch. Steps:
    a copy of the code under your GitHub user account. For more details on
    how to fork a repository see [this guide](https://help.github.com/articles/fork-a-repo/).
 
-2. Clone your fork of the pydicom repo from your GitHub account to your local disk:
+2. Clone your fork of the Invoke-Install repo from your GitHub account to your local disk:
 
 3. Create a ``feature`` branch to hold your development changes:
 
