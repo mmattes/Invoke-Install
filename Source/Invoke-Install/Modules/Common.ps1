@@ -19,3 +19,23 @@ function Remove-Directory {
     
     Remove-Item -Recurse -Force $Path
 }
+
+
+function Get-ShortGUID {
+    <#
+        .SYNOPSIS
+            Gives a short GUID like 3jhCD75fUWjQek8XRmMg 
+        
+        .DESCRIPTION
+            Gives a short GUID like 3jhCD75fUWjQek8XRmMg 
+
+        .EXAMPLE
+            Get-ShortGUID
+    #>    
+    
+    $RandomChar = -join ((65..90) + (97..122) | Get-Random | % {[char]$_})
+    [regex]::Replace([System.Convert]::ToBase64String([guid]::NewGuid().toByteArray()), "[/+=]", $RandomChar)
+}
+
+
+
