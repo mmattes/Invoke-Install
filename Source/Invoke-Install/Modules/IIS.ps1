@@ -328,8 +328,7 @@ function Stop-IISAppPool
         .EXAMPLE
             Stop-IISAppPool -name "MyAppPool" -sleep 10
     #>
-    param(
-        # Application Pool Settings
+    param(        
         [Parameter(Mandatory=$true, Position=1)]
         [string]$name  = $null,
         [bool]  $sleep = $false # seconds
@@ -371,6 +370,221 @@ function Stop-IISAppPool
     End { 
     }
 }
+
+#TODO: applicationRequestRouting
+#TODO: Get free port from range iis
+#TODO: Logging
+#TODO: HealthCheck
+#TODO: Disable Server in Server Farm
+
+function Create-IISServerFarm
+{
+    #TODO: Documentation
+    
+    <#
+        .SYNOPSIS
+            
+        
+        .DESCRIPTION
+
+        .PARAMETER sleep            
+        
+        .EXAMPLE
+            
+    #>
+    param(        
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName  = $null
+    )
+
+    Begin {
+        Use-WebAdministration
+        $ServerFarmHash = @{"name"=$ServerFarmName}
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if ([String]::IsNullOrEmpty($result)) {
+            Add-WebConfiguration -Filter "/webFarms" -Value $ServerFarmHash -PSPath "MACHINE/WEBROOT/APPHOST"
+            Write-Log "Added ServerFarm $ServerFarmName" -LogLevel Information
+        } else {
+            Write-Log "ServerFarm $ServerFarmName already exists" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
+function Remove-IISServerFarm
+{
+    #TODO: Documentation
+    <#
+        .SYNOPSIS
+            Adds a new Server Farm to an IIS Server if it does not exist
+        
+        .DESCRIPTION
+            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+
+        .PARAMETER ServerFarmName 
+            Specifies the name of the ServerFarm
+        
+        .EXAMPLE
+            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(        
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName  = $null
+    )
+
+    Begin {
+        Use-WebAdministration
+        $ServerFarmHash = @{"name"=$ServerFarmName}
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if (-Not ([String]::IsNullOrEmpty($result))) {            
+            Clear-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+            Write-Log "Removed ServerFarm $ServerFarmName" -LogLevel Information
+        } else {
+            Write-Log "ServerFarm $ServerFarmName does not exist" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
+function Add-ServerToIISServerFarm
+{
+    #TODO: Documentation
+    <#
+        .SYNOPSIS
+            Adds a new Server Farm to an IIS Server if it does not exist
+        
+        .DESCRIPTION
+            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+
+        .PARAMETER ServerFarmName 
+            Specifies the name of the ServerFarm
+        
+        .EXAMPLE
+            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(        
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerAddress  = $null,
+        
+        [Parameter(Mandatory=$true, Position=2)]
+        [string]$ServerFarmName  = $null,
+        
+        [Parameter(Mandatory=$false, Position=3)]
+        [bool]$Enabled  = $true,
+        
+        [Parameter(Mandatory=$false, Position=4)]
+        [int]$Weight  = $null,
+        
+        [Parameter(Mandatory=$false, Position=5)]
+        [int]$HttpPort  = $null,
+        
+        [Parameter(Mandatory=$false, Position=6)]
+        [int]$HttpsPort  = $null
+    )
+
+    Begin {
+        Use-WebAdministration
+        $ServerFarmHash = @{"name"=$ServerFarmName}
+        $ServerHash = @{"address"=$ServerAddress;"enabled"=$Enabled}
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if ([String]::IsNullOrEmpty($result)) {
+            Add-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -Value $ServerHash -PSPath "MACHINE/WEBROOT/APPHOST"
+            if($Weight) {
+                Set-WebConfigurationProperty  `
+                    -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" `
+                    -Name "applicationRequestRouting" `
+                    -Value @{ weight = $Weight }  `
+                    -PSPath "MACHINE/WEBROOT/APPHOST"
+            }
+            if($HttpPort) {
+                Set-WebConfigurationProperty  `
+                    -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" `
+                    -Name "applicationRequestRouting" `
+                    -Value @{ httpPort = $HttpPort }  `
+                    -PSPath "MACHINE/WEBROOT/APPHOST"
+            }
+            if($HttpsPort) {
+                Set-WebConfigurationProperty  `
+                    -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" `
+                    -Name "applicationRequestRouting" `
+                    -Value @{ httpsPort = $HttpsPort }  `
+                    -PSPath "MACHINE/WEBROOT/APPHOST"
+            }
+            Write-Log "Server $ServerAddress added to the Server Farm $ServerFarmName" -LogLevel Information
+        } else {
+            Write-Log "Server $ServerAddress already exists in the Server Farm $ServerFarmName" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
+function Set-ServerFarmServerState
+{
+    #TODO: Documentation
+    <#
+        .SYNOPSIS
+            Adds a new Server Farm to an IIS Server if it does not exist
+        
+        .DESCRIPTION
+            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+
+        .PARAMETER ServerFarmName 
+            Specifies the name of the ServerFarm
+        
+        .EXAMPLE
+            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(        
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerAddress  = $null,
+        
+        [Parameter(Mandatory=$true, Position=2)]
+        [string]$ServerFarmName  = $null,
+        
+        [Parameter(Mandatory=$true, Position=3)]
+        [bool]$Online = $null       
+    )
+
+    Begin {
+        Use-WebAdministration
+        $ServerFarmHash = @{"name"=$ServerFarmName}
+        $ServerStateHash = @{"enabled"=$Online}
+        if($Online) {
+            $State = "Online"
+        } else {
+            $State = "Offline"
+        }
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if (-Not ([String]::IsNullOrEmpty($result))) {
+            Set-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" -Value $ServerStateHash -PSPath "MACHINE/WEBROOT/APPHOST"
+            Write-Log "State of server $ServerAddress in server farm $ServerFarmName was changed to $State" -LogLevel Information
+        } else {
+            Write-Log "Server $ServerAddress or server farm $ServerFarmName could not be found" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
 
 function Use-WebAdministration () {
     <#

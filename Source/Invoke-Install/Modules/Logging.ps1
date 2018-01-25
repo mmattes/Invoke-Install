@@ -1,3 +1,5 @@
+#TODO: Improve Logging, add message Type, Colors, may Date
+
 function Write-Log 
 { 
     <#

@@ -37,5 +37,4 @@ function Get-ShortGUID {
     [regex]::Replace([System.Convert]::ToBase64String([guid]::NewGuid().toByteArray()), "[/+=]", $RandomChar)
 }
 
-
-
+#TODO: Get free port from range windows
