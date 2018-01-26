@@ -1,5 +1,3 @@
-#TODO:Sample for ServerFarm
-
 function New-IISWebsite
 {
     <#
@@ -46,7 +44,7 @@ function New-IISWebsite
         [string]  $root     = $null,
 
         [string]  $appPool  = "DefaultAppPool",
-        [Object[]]$bindings = $null
+        [Object[]]$bindings = @{protocol='http';bindingInformation=':80:'}
     )
     
     Begin {
@@ -56,19 +54,13 @@ function New-IISWebsite
     }
     
     Process {
-        Write-Log "Creating IIS Website: $name"
-        
-        if($bindings)
-        {
-            New-Item $iisSite -Type Site -Bindings $bindings -PhysicalPath $root
-        }
-        else
-        {
-            # New-Item is not possible without a Binding, we add one here, you need to remove it later on
-            New-Item $iisSite -Type Site -PhysicalPath $root -Bindings @{protocol='http';bindingInformation=':80:'}
-        }
-        
-        Set-ItemProperty $iisSite -Name ApplicationPool -Value $appPool
+        if(-Not (Test-Path $iisSite)) {
+            Write-Log "Creating IIS Website: $name"
+            New-Item $iisSite -Type Site -Bindings $bindings -PhysicalPath $root        
+            Set-ItemProperty $iisSite -Name ApplicationPool -Value $appPool
+        } else {
+            Write-Log "IIS Website: $name already exists"
+        }        
     }
     
     End { 
@@ -373,8 +365,6 @@ function Stop-IISAppPool
     }
 }
 
-
-#TODO: Get free port from range iis
 #TODO: Logging
 
 function Create-IISServerFarm
@@ -456,7 +446,7 @@ function Remove-IISServerFarm
     }
 }
 
-function Add-ServerToIISServerFarm
+function Add-IISServerToServerFarm
 {
     #TODO: Documentation
     <#
@@ -533,7 +523,7 @@ function Add-ServerToIISServerFarm
     }
 }
 
-function Set-ServerFarmServerState
+function Set-IISServerFarmServerState
 {
     #TODO: Documentation
     <#
@@ -585,7 +575,7 @@ function Set-ServerFarmServerState
     }
 }
 
-function Set-ServerFarmHealthCheck
+function Set-IISServerFarmHealthCheck
 {
     #TODO:Documentation
     <#
@@ -639,7 +629,7 @@ function Set-ServerFarmHealthCheck
     }
 }
 
-function Add-GlobalIISRouting
+function Add-IISGlobalRouting
 {
     #TODO: Documentation
     <#
