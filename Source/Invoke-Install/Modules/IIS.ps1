@@ -1,3 +1,5 @@
+#TODO:Sample for ServerFarm
+
 function New-IISWebsite
 {
     <#
@@ -371,10 +373,9 @@ function Stop-IISAppPool
     }
 }
 
-#TODO: applicationRequestRouting
+
 #TODO: Get free port from range iis
 #TODO: Logging
-#TODO: Disable Server in Server Farm (https://forums.iis.net/t/1156563.aspx)
 
 function Create-IISServerFarm
 {
@@ -631,6 +632,85 @@ function Set-ServerFarmHealthCheck
                 -PSPath "MACHINE/WEBROOT/APPHOST"
         } else {
             Write-Log "Server $ServerAddress or server farm $ServerFarmName could not be found" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
+function Add-GlobalIISRouting
+{
+    #TODO: Documentation
+    <#
+        .SYNOPSIS
+            Adds a new Server Farm to an IIS Server if it does not exist
+        
+        .DESCRIPTION
+            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+
+        .PARAMETER ServerFarmName 
+            Specifies the name of the ServerFarm
+        
+        .EXAMPLE
+            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$RuleName = $null,
+        
+        [Parameter(Mandatory=$true, Position=2)]
+        [bool]$StopProcessing = $false,
+        
+        [Parameter(Mandatory=$true, Position=3)]
+        [string]$MatchUrl = $null,
+        
+        [Parameter(Mandatory=$true, Position=4)]
+        [array]$Conditions = $null, # @(@{"input"="{HTTP_HOST}"; "pattern"="^alwaysup$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"})
+        
+        [Parameter(Mandatory=$true, Position=5)]
+        [hashtable]$Action = $null # @{"type"="Rewrite";url="http://myurl.com/{R:0}"}
+    )
+
+    Begin {
+        Use-WebAdministration
+        $RuleHash = @{"name"=$RuleName;"stopProcessing"=$StopProcessing}
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if (([String]::IsNullOrEmpty($result))) {
+            Add-WebConfiguration `
+                -Filter "/system.webServer/rewrite/globalRules" `
+                -Value $RuleHash `
+                -PSPath "MACHINE/WEBROOT/APPHOST"
+        
+            Set-WebConfigurationProperty  `
+                -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]" `
+                -Name "match" `
+                -Value @{ url = $MatchUrl }  `
+                -PSPath "MACHINE/WEBROOT/APPHOST"
+                
+            Set-WebConfigurationProperty  `
+                -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]" `
+                -Name "stopProcessing" `
+                -Value @{ stopProcessing = $true }  `
+                -PSPath "MACHINE/WEBROOT/APPHOST"
+                
+            Set-WebConfigurationProperty  `
+                -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]" `
+                -Name "action" `
+                -Value $Action  `
+                -PSPath "MACHINE/WEBROOT/APPHOST"
+                
+            $Conditions | ForEach-Object {
+                Add-WebConfiguration `
+                    -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]/conditions" `
+                    -Value $_ `
+                    -PSPath "MACHINE/WEBROOT/APPHOST"
+            }
+        } else {
+            Write-Log "Rule $RuleName already exists, Add-IISGlobalRouting will do nothing" -LogLevel Information
         }
     }
     
