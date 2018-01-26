@@ -374,8 +374,7 @@ function Stop-IISAppPool
 #TODO: applicationRequestRouting
 #TODO: Get free port from range iis
 #TODO: Logging
-#TODO: HealthCheck
-#TODO: Disable Server in Server Farm
+#TODO: Disable Server in Server Farm (https://forums.iis.net/t/1156563.aspx)
 
 function Create-IISServerFarm
 {
@@ -576,6 +575,60 @@ function Set-ServerFarmServerState
         if (-Not ([String]::IsNullOrEmpty($result))) {
             Set-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" -Value $ServerStateHash -PSPath "MACHINE/WEBROOT/APPHOST"
             Write-Log "State of server $ServerAddress in server farm $ServerFarmName was changed to $State" -LogLevel Information
+        } else {
+            Write-Log "Server $ServerAddress or server farm $ServerFarmName could not be found" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
+function Set-ServerFarmHealthCheck
+{
+    #TODO:Documentation
+    <#
+        .SYNOPSIS
+            Adds a new Server Farm to an IIS Server if it does not exist
+        
+        .DESCRIPTION
+            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+
+        .PARAMETER ServerFarmName 
+            Specifies the name of the ServerFarm
+        
+        .EXAMPLE
+            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName  = $null,
+        
+        [Parameter(Mandatory=$true, Position=2)]
+        [string]$Url = $null,
+        
+        [Parameter(Mandatory=$true, Position=3)]
+        [string]$ResponseMatch = $null
+    )
+
+    Begin {
+        Use-WebAdministration       
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if (-Not ([String]::IsNullOrEmpty($result))) {
+            Set-WebConfigurationProperty  `
+                -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/applicationRequestRouting" `
+                -Name "healthCheck" `
+                -Value @{ url = $Url }  `
+                -PSPath "MACHINE/WEBROOT/APPHOST"
+                
+            Set-WebConfigurationProperty  `
+                -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/applicationRequestRouting" `
+                -Name "healthCheck" `
+                -Value @{ responseMatch = $ResponseMatch }  `
+                -PSPath "MACHINE/WEBROOT/APPHOST"
         } else {
             Write-Log "Server $ServerAddress or server farm $ServerFarmName could not be found" -LogLevel Information
         }
