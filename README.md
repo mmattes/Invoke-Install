@@ -37,6 +37,14 @@ Invoke-Install MyApp.install.ps1
 
 Check out the Examples in ``Examples/`` to see what currently can be done with Invoke-Install. Feel free to contribute and add more Modules. 
 
+## Release History
+
+* 1.1.1
+    * ADD: Get-ShortGUID, Get-FreePortFromRange, Remove-IISServerFarm, Add-IISServerToServerFarm, Set-IISServerFarmServerState, Set-IISServerFarmHealthCheck, Add-IISGlobalRouting, Add-WindowsHostsRecord, Remove-WindowsHostsRecord
+    * ADD: [IIS Server Farm sample](Examples/IISSiteWithServerFarm.install.ps1)
+* 1.0.1
+    * First propper release
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](Doc/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
