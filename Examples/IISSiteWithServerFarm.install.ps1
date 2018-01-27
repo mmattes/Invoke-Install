@@ -8,7 +8,6 @@ $PackageName = "Sample.Package"
 $InstPath = $ENV:InstPath + "\$PackageName.$ShortGUID"
 $IisRoot = $InstPath + "\bin"
 $ProductZip = $PSScriptRoot + "\$PackageName.zip"
-$BinaryPath = $InstPath + "\bin\$PackageName.exe"
 $ServerFarmName = "$PackageName.ServerFarm"
 
 # get more variables depending on the enviroment
@@ -52,7 +51,7 @@ switch ($ENV:Environment) {
 }
 
 # add a default website which listens to the main url and port normally www.example.com and 80
-New-IISWebsite -name $SiteName -root $IisRoot -bindings @{protocol='http';bindingInformation='*:80:$Url'}
+New-IISWebsite -name $SiteName -root $IisRoot -bindings @{protocol='http';bindingInformation="*:80:$Url"}
 
 # append the guid to the variables for the next steps
 $AppPoolName = "$AppPoolName.$ShortGUID"
@@ -76,16 +75,18 @@ New-IISApplicationPool -Name $AppPoolName -StartMode "AlwaysRunning" -IdentityTy
 New-IISWebsite -name $SiteName -root $IisRoot -appPool $AppPoolName
 Use-WebAdministration
 Remove-WebBinding -Name $SiteName -Protocol "http" -Port 80 -IPAddress "*"
-New-WebBinding -Name $SiteName -Protocol "http" -Port $Port -IPAddress "*" -HostHeader $UrlWithGuid
+
+# do not add a binding to an url to the site
+New-WebBinding -Name $SiteName -Protocol "http" -Port $Port -IPAddress "*" -HostHeader ""
 Add-WebConfiguration -Value @{Name="ASPNETCORE_ENVIRONMENT"; Value=$ENV:Environment} -Filter system.webServer/aspNetCore/environmentVariables -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
 Start-Website -Name $SiteName
 
-# We set a global URL Rewrite from our URL to the Server Farm which then deals with all requests
-Add-IISGlobalRouting -RuleName "Rewrite $Url to ServerFarm $ServerFarmName" -MatchUrl ".*" -Conditions @(@{"input"="{HTTP_HOST}"; "pattern"="^$Url$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"}) -Action @{"type"="Rewrite";url="http://$Url/{R:0}"} -StopProcessing $false
+# We set a global URL Rewrite from our URL to the Server Farm which then deals with all requests, the URL for a server farm is http://SERVERFARMNAME or https://SERVERFARMNAME
+Add-IISGlobalRouting -RuleName "Rewrite $Url to ServerFarm $ServerFarmName" -MatchUrl ".*" -Conditions @(@{"input"="{HTTP_HOST}"; "pattern"="^$Url$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"}) -Action @{"type"="Rewrite";url="http://$ServerFarmName/{R:0}"} -StopProcessing $false
 
 # Create Server Farm will only create a new one if it does not exist so we can run it every time
 Create-IISServerFarm -ServerFarmName "$ServerFarmName"
-Set-IISServerFarmhealthCheck -ServerFarmName "$ServerFarmName" -Url "$Url/up.html" -ResponseMatch "up"
+Set-IISServerFarmhealthCheck -ServerFarmName "$ServerFarmName" -Url "http://$Url/up.html" -ResponseMatch "up"
 
 # Now we add a new enty pointing to 127.0.0.1 to the local hosts file of windows so that we do not need to worry
 # about network wide dns resolution

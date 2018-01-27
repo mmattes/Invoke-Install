@@ -18,15 +18,19 @@ if (!(Get-Module Invoke-Install)){
 # Set global variables which are used within the *.install.ps1 files then
 switch ($Enviroment) {
     "Development" {
+        $ENV:Environment = "Development"
         $TargetRoot = "D:\$Enviroment\App"
     }
     "Staging" {
+        $ENV:Environment = "Staging"
         $TargetRoot = "D:\$Enviroment\App"
     }
     "Production" {
+        $ENV:Environment = "Production"
         $TargetRoot = "D:\Web\App"
     }
     "Local" {
+        $ENV:Environment = "Local"
         $TargetRoot = "C:\Web\App"
     }
     default {

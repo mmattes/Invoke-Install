@@ -87,9 +87,9 @@ function Get-FreePortFromRange
         }
         
         
-        $PortRange | ForEach-Object {           
-            if ($PortsInUse -notcontains $_) {
-                return $_
+        foreach ($Port in $PortRange) {
+            if ($PortsInUse -notcontains $Port) {
+                return $Port
             }
         }
         return $null
