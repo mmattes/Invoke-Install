@@ -39,6 +39,9 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+* 1.2.1
+    * CHANGE: Remove-IISWebsite has now a filter and exculde parameter to delete multiple items at once
+    * CHANGE: Remove-IISApplicationPool has now a filter and exculde parameter to delete multiple items at once
 * 1.1.1
     * ADD: Get-ShortGUID, Get-FreePortFromRange, Remove-IISServerFarm, Add-IISServerToServerFarm, Set-IISServerFarmServerState, Set-IISServerFarmHealthCheck, Add-IISGlobalRouting, Add-WindowsHostsRecord, Remove-WindowsHostsRecord
     * ADD: [IIS Server Farm sample](Examples/IISSiteWithServerFarm.install.ps1)

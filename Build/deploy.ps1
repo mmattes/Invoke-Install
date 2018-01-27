@@ -6,7 +6,7 @@ $ManifestPath = $SourcePath + "\Invoke-Install.psd1"
 $Manifest = Test-ModuleManifest -Path $ManifestPath
 [System.Version]$Version = $Manifest.Version
 Write-Output "Old Version: $Version"
-[String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, ($Version.Build+1), 0)
+[String]$NewVersion = New-Object -TypeName System.Version -ArgumentList ($Version.Major, $Version.Minor, ($Version.Build+1))
 Write-Output "New Version: $NewVersion"
 
 Update-ModuleManifest -Path $ManifestPath -ModuleVersion $NewVersion

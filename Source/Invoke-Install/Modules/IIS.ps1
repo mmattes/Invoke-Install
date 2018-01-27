@@ -78,29 +78,57 @@ function Remove-IISWebsite
 
         .PARAMETER name
             Name of the website to remove in IIS
+            
+        .PARAMETER Filter
+            Specifies a filter for the name of the iis site, all sites matching the filter will be removed
+            
+        .PARAMETER Exclude
+            Specifies which sites should be excluded when using the filter parameter
         
         .EXAMPLE
             Remove-IISWebsite -name "MyWebsite"
+            
+        .EXAMPLE
+            Remove-IISWebsite -Filter "MySite.*" -Exclude "MySite.1.1.14"
     #>
 
     param(                
-        [Parameter(Mandatory=$true, Position=1)]
-        [string]$name    = $null
+        [CmdletBinding(DefaultParameterSetName='ByName')]
+        [Parameter(Mandatory=$true, ParameterSetName='ByName', Position=1)]
+        [string]$name    = $null,
+        
+        [Parameter(Mandatory=$true, ParameterSetName='ByFilter', Position=2)]
+        [string]$Filter    = $null,
+        
+        [Parameter(Mandatory=$false, ParameterSetName='ByFilter', Position=2)]
+        [string]$Exclude    = ""
     )
     
     Begin {
         Use-WebAdministration
-        # IIS Directory Settings
-        [string]$iisSite = "IIS:\Sites\$($name)"
+        
+        if ($PSCmdlet.ParameterSetName -eq 'ByName')
+        {
+            # IIS Directory Settings
+            [string]$iisSite = "IIS:\Sites\$($name)"
+        }
     }
     
     Process {
-        # Remove Website
-        if(Test-Path $iisSite)
+        if ($PSCmdlet.ParameterSetName -eq 'ByName')
         {
-            Write-Log "Deleting IIS Website: $name"
-            
-            Remove-Website $name
+            if(Test-Path $iisSite)
+            {
+                Write-Log "Deleting IIS Website: $name"
+                Remove-Website $name
+            }
+        } elseif ($PSCmdlet.ParameterSetName -eq 'ByFilter') {
+            $Result = Get-Item -Path "IIS:\Sites\$Filter"
+            foreach ($Item in $Result) {
+                if ($Item.Name -notlike $Exclude) {
+                    Remove-Website $Item.Name
+                }
+            }
         }
     }
     
@@ -271,30 +299,57 @@ function Remove-IISApplicationPool
 
         .PARAMETER name
             Name of the IIS Application Pool to remove
+            
+        .PARAMETER Filter
+            Specifies a filter for the name of the iis apppool, all apppools matching the filter will be removed
+            
+        .PARAMETER Exclude
+            Specifies which apppool should be excluded when using the filter parameter
         
         .EXAMPLE
             Remove-IISApplicationPool -name "MyAppPool"
+            
+        .EXAMPLE
+            Remove-IISApplicationPool -Filter "MyAppPool.*" -Exclude "MyAppPool.1.1.14"
     #>
     param(        
-        # Application Pool Settings
-        [Parameter(Mandatory=$true, Position=1)]
-        [string]$name = $null
+        [CmdletBinding(DefaultParameterSetName='ByName')]
+        [Parameter(Mandatory=$true, ParameterSetName='ByName', Position=1)]
+        [string]$name    = $null,
+        
+        [Parameter(Mandatory=$true, ParameterSetName='ByFilter', Position=2)]
+        [string]$Filter    = $null,
+        
+        [Parameter(Mandatory=$false, ParameterSetName='ByFilter', Position=2)]
+        [string]$Exclude    = ""
     )
     
     Begin {
         Use-WebAdministration
-        # IIS Directory Settings
-        [string]$iisPoolPath = "IIS:\AppPools\$($name)\"
+        if ($PSCmdlet.ParameterSetName -eq 'ByName')
+        {
+            # IIS Directory Settings
+            [string]$iisPoolPath = "IIS:\AppPools\$($name)"
+        }        
     }
     
     Process {
-        if(Test-Path $iisPoolPath)
+        if ($PSCmdlet.ParameterSetName -eq 'ByName')
         {
-            Write-Log "Removing Application Pool: $name"
-            
-            Stop-IISAppPool $name
-            
-            Remove-WebAppPool $name
+            if(Test-Path $iisPoolPath)
+            {
+                Write-Log "Removing Application Pool: $name"
+                Stop-IISAppPool $name
+                Remove-WebAppPool $name
+            }
+        } elseif ($PSCmdlet.ParameterSetName -eq 'ByFilter') {
+            $Result = Get-Item -Path "IIS:\AppPools\$Filter"
+            foreach ($Item in $Result) {
+                if ($Item.Name -notlike $Exclude) {
+                    Stop-IISAppPool $Item.Name
+                    Remove-WebAppPool $Item.Name
+                }
+            }
         }
     }
     
