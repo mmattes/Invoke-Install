@@ -365,21 +365,20 @@ function Stop-IISAppPool
     }
 }
 
-#TODO: Logging
-
 function Create-IISServerFarm
 {
-    #TODO: Documentation
-    
     <#
         .SYNOPSIS
-            
+            Creates an IIS Server Farm with the specified ServerFarmName if it does not already exist
         
         .DESCRIPTION
+            Creates an IIS Server Farm with the specified ServerFarmName if it does not already exist
 
-        .PARAMETER sleep            
+        .PARAMETER ServerFarmName
+            Specifies the name of the server farm to create
         
         .EXAMPLE
+            Create-IISServerFarm -ServerFarmName "MyServerFarm"
             
     #>
     param(        
@@ -396,7 +395,7 @@ function Create-IISServerFarm
         $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
         if ([String]::IsNullOrEmpty($result)) {
             Add-WebConfiguration -Filter "/webFarms" -Value $ServerFarmHash -PSPath "MACHINE/WEBROOT/APPHOST"
-            Write-Log "Added ServerFarm $ServerFarmName" -LogLevel Information
+            Write-Log "Created ServerFarm: $ServerFarmName" -LogLevel Information
         } else {
             Write-Log "ServerFarm $ServerFarmName already exists" -LogLevel Information
         }
@@ -408,19 +407,18 @@ function Create-IISServerFarm
 
 function Remove-IISServerFarm
 {
-    #TODO: Documentation
     <#
         .SYNOPSIS
-            Adds a new Server Farm to an IIS Server if it does not exist
+            Removes server farm from IIS if it exists
         
         .DESCRIPTION
-            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+            Removes server farm from IIS if it exists
 
         .PARAMETER ServerFarmName 
-            Specifies the name of the ServerFarm
+            Specifies the name of the ServerFarm to be removed
         
         .EXAMPLE
-            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+            Remove-IISServerFarm -ServerFarmName "MyServerFarm"
     #>
     param(        
         [Parameter(Mandatory=$true, Position=1)]
@@ -436,9 +434,9 @@ function Remove-IISServerFarm
         $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
         if (-Not ([String]::IsNullOrEmpty($result))) {            
             Clear-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
-            Write-Log "Removed ServerFarm $ServerFarmName" -LogLevel Information
+            Write-Log "Removed server farm: $ServerFarmName" -LogLevel Information
         } else {
-            Write-Log "ServerFarm $ServerFarmName does not exist" -LogLevel Information
+            Write-Log "Server farm $ServerFarmName does not exist" -LogLevel Information
         }
     }
     
@@ -448,19 +446,38 @@ function Remove-IISServerFarm
 
 function Add-IISServerToServerFarm
 {
-    #TODO: Documentation
     <#
         .SYNOPSIS
-            Adds a new Server Farm to an IIS Server if it does not exist
+            Adds a server to a IIS server farm
         
         .DESCRIPTION
-            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+            Adds a server to a IIS server farm if the server farm exists
+
+        .PARAMETER ServerAddress
+            Specifies the address of the server which should be added to the server farm
 
         .PARAMETER ServerFarmName 
-            Specifies the name of the ServerFarm
+            Specifies the name of the server farm to which the server should be added
+        
+        .PARAMETER Enabled
+            Specifies whether or not the server should be added as online or offline to the server farm
+
+            Default = $true
+
+        .PARAMETER Weight
+            Specifies the weight for the routing / load balancing
+
+        .PARAMETER HttpPort
+            Specifies the HTTP port under which the server is litening at the given ServerAddress
+
+        .PARAMETER HttpPort
+            Specifies the HTTPS port under which the server is litening at the given ServerAddress
         
         .EXAMPLE
-            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+            Add-IISServerToServerFarm -ServerFarmName "MyServerFarm" -ServerAddress "a.myfarm.example.com" -HttpPort 8001
+
+        .EXAMPLE
+            Add-IISServerToServerFarm -ServerFarmName "MyServerFarm" -ServerAddress "a.myfarm.example.com" -HttpPort 8001 -Weight 50
     #>
     param(        
         [Parameter(Mandatory=$true, Position=1)]
@@ -513,9 +530,9 @@ function Add-IISServerToServerFarm
                     -Value @{ httpsPort = $HttpsPort }  `
                     -PSPath "MACHINE/WEBROOT/APPHOST"
             }
-            Write-Log "Server $ServerAddress added to the Server Farm $ServerFarmName" -LogLevel Information
+            Write-Log "Server $ServerAddress added to the server farm $ServerFarmName" -LogLevel Information
         } else {
-            Write-Log "Server $ServerAddress already exists in the Server Farm $ServerFarmName" -LogLevel Information
+            Write-Log "Server $ServerAddress already exists in the server farm $ServerFarmName" -LogLevel Information
         }
     }
     
@@ -525,19 +542,24 @@ function Add-IISServerToServerFarm
 
 function Set-IISServerFarmServerState
 {
-    #TODO: Documentation
     <#
         .SYNOPSIS
-            Adds a new Server Farm to an IIS Server if it does not exist
+            Changes the state of a server within a iis server farm
         
         .DESCRIPTION
-            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+            Changes the state of a server within a iis server farm
+
+        .PARAMETER ServerAddress
+            Specifies the address of the server which should be added to the server farm
 
         .PARAMETER ServerFarmName 
-            Specifies the name of the ServerFarm
+            Specifies the name of the server farm to which the server should be added
+
+        .PARAMETER Online
+            Specifies whether or not the server should be set online or offline
         
         .EXAMPLE
-            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+            Set-IISServerFarmServerState -ServerFarmName "MyServerFarm" -ServerAddress "a.myfarm.example.com" -Online $false
     #>
     param(        
         [Parameter(Mandatory=$true, Position=1)]
@@ -577,19 +599,24 @@ function Set-IISServerFarmServerState
 
 function Set-IISServerFarmHealthCheck
 {
-    #TODO:Documentation
     <#
         .SYNOPSIS
-            Adds a new Server Farm to an IIS Server if it does not exist
+            Sets the IIS health check for a IIS server farm
         
         .DESCRIPTION
-            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+            Sets the IIS health check for a IIS server farm
 
         .PARAMETER ServerFarmName 
-            Specifies the name of the ServerFarm
+            Specifies the name of the server farm
+        
+        .PARAMETER Url
+            Specifies the URL which should be verified to validate health of a server within the server farm
+
+        .PARAMETER ResponseMatch
+            Specifies the expected response from the url if a server is healty
         
         .EXAMPLE
-            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+            Set-IISServerFarmHealthCheck -ServerFarmName "MyServerFarm" -Url "a.myfarm.example.com/health.html" -ResponseMatch "up"
     #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
@@ -620,6 +647,8 @@ function Set-IISServerFarmHealthCheck
                 -Name "healthCheck" `
                 -Value @{ responseMatch = $ResponseMatch }  `
                 -PSPath "MACHINE/WEBROOT/APPHOST"
+
+            Write-Log "Set health check for server farm $ServerFarmName to Url $Url, ResponseMatch: $ResponseMatch" -LogLevel Information
         } else {
             Write-Log "Server $ServerAddress or server farm $ServerFarmName could not be found" -LogLevel Information
         }
@@ -631,19 +660,37 @@ function Set-IISServerFarmHealthCheck
 
 function Add-IISGlobalRouting
 {
-    #TODO: Documentation
     <#
         .SYNOPSIS
-            Adds a new Server Farm to an IIS Server if it does not exist
+            Adds a new global routing to IIS 
         
         .DESCRIPTION
-            Adds a new Server Farm to an IIS Server using the WebAdministration Module, 
+            Adds a new global routing to IIS if it does not already exist
+            
+        .PARAMETER RuleName
+            Specifies the name of the rule to be added
+        
+        .PARAMETER StopProcessing
+            Specifies wether or not other rules should be processed after this one 
 
-        .PARAMETER ServerFarmName 
-            Specifies the name of the ServerFarm
+        .PARAMETER MatchUrl
+            Specifies the url which needs to be matched so that this rule applies. 
+            This match is for the content behind the domain so in case of 
+            www.sample.com/foo/bar it is about the /foo/bar part
+
+        .PARAMETER Conditions
+            Specifies further conditions which need to match in order to continue with the action.
+            This needs to be provided as an array of hashes. 
+            @(@{"input"="{HTTP_HOST}"; "pattern"="^www.sample.com$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"})
+
+        .PARAMETER Action
+            Specifies the action to be performed when the url and conditions match
+            This is a hashtable of the format @{"type"="Rewrite";url="http://myurl.com/{R:0}"}
+            In case of redirecting to a server farm the myurl.com part needs to match the exact name of the 
+            server farm on this IIS server
         
         .EXAMPLE
-            Create-IISServerFarm -ServerFarmName "MyServerFarm"
+            Add-IISGlobalRouting -RuleName "Rewrite myurl.com to ServerFarm MyServerFarm" -MatchUrl ".*" -Conditions @(@{"input"="{HTTP_HOST}"; "pattern"="^myurl.com$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"}) -Action @{"type"="Rewrite";url="http://MyServerFarm/{R:0}"} -StopProcessing $false
     #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
@@ -656,10 +703,10 @@ function Add-IISGlobalRouting
         [string]$MatchUrl = $null,
         
         [Parameter(Mandatory=$true, Position=4)]
-        [array]$Conditions = $null, # @(@{"input"="{HTTP_HOST}"; "pattern"="^alwaysup$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"})
+        [array]$Conditions = $null, 
         
         [Parameter(Mandatory=$true, Position=5)]
-        [hashtable]$Action = $null # @{"type"="Rewrite";url="http://myurl.com/{R:0}"}
+        [hashtable]$Action = $null 
     )
 
     Begin {
@@ -674,13 +721,13 @@ function Add-IISGlobalRouting
                 -Filter "/system.webServer/rewrite/globalRules" `
                 -Value $RuleHash `
                 -PSPath "MACHINE/WEBROOT/APPHOST"
-        
+
             Set-WebConfigurationProperty  `
                 -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]" `
                 -Name "match" `
                 -Value @{ url = $MatchUrl }  `
                 -PSPath "MACHINE/WEBROOT/APPHOST"
-                
+
             Set-WebConfigurationProperty  `
                 -Filter "/system.webServer/rewrite/globalRules/rule[@name=""$($RuleName)""]" `
                 -Name "stopProcessing" `
@@ -699,6 +746,9 @@ function Add-IISGlobalRouting
                     -Value $_ `
                     -PSPath "MACHINE/WEBROOT/APPHOST"
             }
+
+            Write-Log "Created rule: $RuleName" -LogLevel Information
+
         } else {
             Write-Log "Rule $RuleName already exists, Add-IISGlobalRouting will do nothing" -LogLevel Information
         }

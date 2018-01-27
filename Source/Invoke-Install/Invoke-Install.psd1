@@ -67,7 +67,7 @@ PowerShellVersion = '5.0'
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()
-# TODO: ADD what is needed
+
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Invoke-Install', 'Remove-Directory', 'New-WindowsTask', 
                'Remove-WindowsTask', 'Stop-WindowsService', 'Remove-WindowsService', 
