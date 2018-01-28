@@ -39,6 +39,10 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+Remove-IISServerFromServerFarm
+
+* 1.3.1
+	* ADD: Remove-IISServerFromServerFarm to remove on or more severs from a server farm
 * 1.2.1
     * CHANGE: Remove-IISWebsite has now a filter and exculde parameter to delete multiple items at once
     * CHANGE: Remove-IISApplicationPool has now a filter and exculde parameter to delete multiple items at once
