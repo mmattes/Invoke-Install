@@ -595,6 +595,87 @@ function Add-IISServerToServerFarm
     }
 }
 
+function Remove-IISServerFromServerFarm
+{
+    <#
+        .SYNOPSIS
+            Removes one or more servers from the sever farm
+        
+        .DESCRIPTION
+            Removes one or more servers from the sever farm, either use SeverAddress or Filter
+
+        .PARAMETER ServerAddress
+            Specifies the address of the server which should be removed from the server farm
+
+        .PARAMETER ServerFarmName 
+            Specifies the name of the server farm from which one or more servers should be removed 
+        
+        .PARAMETER Filter
+            Specifies a filter for the address of the server, all servers matching the filter will be removed
+            
+        .PARAMETER Exclude
+            Specifies which server address should be excluded when using the filter parameter
+
+        .EXAMPLE
+            Remove-IISServerFromServerFarm -ServerFarmname "MyServerFarm" -ServerAddress "a.myserver.com"
+
+        .EXAMPLE
+            Remove-IISServerFromServerFarm -ServerFarmname "MyServerFarm" -Filter "*.myserver.com" -Exclude "b.myserver.com"
+    #>
+    param(        
+        [CmdletBinding(DefaultParameterSetName='ByAddress')]
+        [Parameter(Mandatory=$true, ParameterSetName='ByAddress', Position=1)]      
+        [string]$ServerAddress  = $null,
+        
+        [Parameter(Mandatory=$true, ParameterSetName='ByAddress', Position=2)]
+        [Parameter(Mandatory=$true, ParameterSetName='ByFilter', Position=2)]
+        [string]$ServerFarmName  = $null,
+        
+        [Parameter(Mandatory=$true, ParameterSetName='ByFilter', Position=3)]
+        [string]$Filter  = $null,
+        
+        [Parameter(Mandatory=$false, ParameterSetName='ByFilter', Position=4)]
+        [string]$Exclude  = ""
+    )
+
+    Begin {
+        Use-WebAdministration
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if (([String]::IsNullOrEmpty($result))){
+            Write-Log "Server farm $ServerFarmName not found" -LogLevel Information
+            return
+        }
+        
+        if ($PSCmdlet.ParameterSetName -eq 'ByAddress') {
+            $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+            if (-not ([String]::IsNullOrEmpty($result))){ 
+                Clear-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($ServerAddress)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+                Write-Log "Server $ServerAddress remove from sever farm $ServerFarmName" -LogLevel Information
+            } else {
+                Write-Log "Server $ServerAddress could not be found in server farm $ServerFarmName" -LogLevel Information
+            }
+        } elseif ($PSCmdlet.ParameterSetName -eq 'ByFilter') {
+            $result = Get-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@*]" -PSPath "MACHINE/WEBROOT/APPHOST"
+            if (-not ([String]::IsNullOrEmpty($result))) {
+                foreach ($server in $result) {
+                    if (($server.Address -like $Filter) -and ($server.Address -notlike $Exclude)) {
+                        Clear-WebConfiguration -Filter "/webFarms/WebFarm[@name=""$($ServerFarmName)""]/server[@address=""$($server.Address)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+                        Write-Log "Server $server.Address remove from sever farm $ServerFarmName" -LogLevel Information
+                    }
+                }
+            } else {
+                Write-Log "Server farm $ServerFarmName does not contain any servers" -LogLevel Information
+            }
+        }
+    }
+    
+    End { 
+    }
+}
+
 function Set-IISServerFarmServerState
 {
     <#
