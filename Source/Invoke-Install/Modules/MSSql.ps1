@@ -34,7 +34,6 @@ function Use-MicrosoftSqlServerDac
             Use-MicrosoftSqlServerDac
     #>
     if ("Microsoft.SqlServer.Dac.DacService" -as [type]) {
-    {
         $Version = 0
         $MicrosoftSqlServerDacDLLPath = ""
     
