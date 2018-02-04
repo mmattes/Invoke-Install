@@ -41,6 +41,10 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 Remove-IISServerFromServerFarm
 
+* 1.4.1
+	* ADD: Use-SqlServerModule to install and load the SqlServerModule
+	* ADD: Update-SqlDatabase updates a sqldatabase using a dacpac file 
+	* ADD: Get-SqlUpdateScript generates a sql update script for a sqldatabase using a dacpac file
 * 1.3.1
 	* ADD: Remove-IISServerFromServerFarm to remove on or more severs from a server farm
 * 1.2.1
