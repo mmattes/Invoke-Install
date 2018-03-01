@@ -499,6 +499,71 @@ function Remove-IISServerFarm
     }
 }
 
+
+function Set-IISAppPoolConfig
+{
+    <#
+        .SYNOPSIS
+            Sets the config for the AppPool specified by the parameter AppPoolName
+        
+        .DESCRIPTION
+            Sets the config for the AppPool specified by the parameter AppPoolName
+
+        .PARAMETER AppPoolName
+            Specifies the AppPool where the configuration should be changed
+
+        .PARAMETER IdleTimeout
+            Specifies the IdleTimeout value to be set for the specified AppPool
+
+        .PARAMETER AppPoolName
+            Specifies the PeriodicRestart value to be set for the specified AppPool
+        
+        .EXAMPLE
+            Set-IISAppPoolConfig -AppPoolName "MyAppPool" -IdleTimeout "00:00:00" -PeriodicRestart "00:00:00"
+    #>
+    param(        
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$AppPoolName  = $null,
+
+        [Parameter(Mandatory=$false, Position=2)]
+        [string]$IdleTimeout  = $null,
+
+        [Parameter(Mandatory=$false, Position=3)]
+        [string]$PeriodicRestart  = $null
+    )
+
+    Begin {
+        Use-WebAdministration        
+    }
+    
+    Process {
+        $result = Get-WebConfiguration -Filter "/system.applicationHost/applicationPools/add[@name=""$($AppPoolName)""]" -PSPath "MACHINE/WEBROOT/APPHOST"
+        if (-Not ([String]::IsNullOrEmpty($result))) {
+            if($IdleTimeout) {
+                Set-WebConfigurationProperty `
+                    -Filter "/system.applicationHost/applicationPools/add[@name=""$($AppPoolName)""]" `
+                    -Name "processModel" `
+                    -Value @{"idleTimeout"=$IdleTimeout} `
+                    -PSPath "MACHINE/WEBROOT/APPHOST"
+            }
+            
+            if($PeriodicRestart) {
+                Set-WebConfigurationProperty `
+                    -Filter "/system.applicationHost/applicationPools/add[@name=""$($AppPoolName)""]/recycling" `
+                    -Name "periodicRestart" `
+                    -Value @{"time"=$PeriodicRestart} `
+                    -PSPath "MACHINE/WEBROOT/APPHOST"
+            }
+        } else {
+            Write-Log "AppPool $AppPoolName does not exist" -LogLevel Information
+        }
+    }
+    
+    End { 
+    }
+}
+
+
 function Add-IISServerToServerFarm
 {
     <#
