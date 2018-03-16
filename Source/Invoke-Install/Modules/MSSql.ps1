@@ -45,8 +45,7 @@ function Use-MicrosoftSqlServerDac
             }   
         }
 
-        #Register the DLL we need
-        Add-Type -Path $MicrosoftSqlServerDacDLLPath
+        return $MicrosoftSqlServerDacDLLPath
     }        
 }
 
@@ -94,7 +93,8 @@ function Update-SqlDatabase
     )
     
     Begin {
-        Use-MicrosoftSqlServerDac
+        $DLLPath = Use-MicrosoftSqlServerDac
+        Add-Type -Path $DLLPath
 
         if(-Not($DacDeployOptions)) {
             $DeployOptions = New-Object Microsoft.SqlServer.Dac.DacDeployOptions
@@ -160,7 +160,8 @@ function Get-SqlUpdateScript
     )
     
     Begin {
-        Use-MicrosoftSqlServerDac
+        $DLLPath = Use-MicrosoftSqlServerDac
+        Add-Type -Path $DLLPath
 
         if(-Not($DacDeployOptions)) {
             $DeployOptions = New-Object Microsoft.SqlServer.Dac.DacDeployOptions
