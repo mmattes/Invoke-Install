@@ -33,7 +33,7 @@ function Use-MicrosoftSqlServerDac
         .EXAMPLE
             Use-MicrosoftSqlServerDac
     #>
-    if ("Microsoft.SqlServer.Dac.DacService" -as [type]) {
+    if (-Not ("Microsoft.SqlServer.Dac.DacService" -as [type])) {
         $Version = 0
         $MicrosoftSqlServerDacDLLPath = ""
     
@@ -45,7 +45,7 @@ function Use-MicrosoftSqlServerDac
             }   
         }
 
-        return $MicrosoftSqlServerDacDLLPath
+        Add-Type -Path $MicrosoftSqlServerDacDLLPath
     }        
 }
 
@@ -93,8 +93,7 @@ function Update-SqlDatabase
     )
     
     Begin {
-        $DLLPath = Use-MicrosoftSqlServerDac
-        Add-Type -Path $DLLPath
+        Use-MicrosoftSqlServerDac        
 
         if(-Not($DacDeployOptions)) {
             $DeployOptions = New-Object Microsoft.SqlServer.Dac.DacDeployOptions
@@ -160,8 +159,7 @@ function Get-SqlUpdateScript
     )
     
     Begin {
-        $DLLPath = Use-MicrosoftSqlServerDac
-        Add-Type -Path $DLLPath
+        Use-MicrosoftSqlServerDac        
 
         if(-Not($DacDeployOptions)) {
             $DeployOptions = New-Object Microsoft.SqlServer.Dac.DacDeployOptions
