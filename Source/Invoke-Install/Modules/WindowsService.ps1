@@ -145,6 +145,9 @@ function New-WindowsService
 
         .EXAMPLE
             New-WindowsService -ServiceName "MyService" -BinaryPath "C:\MyService\myservice.exe" -User ".\MyUser" -Password "MyPassword"
+
+        .EXAMPLE
+            New-WindowsService -ServiceName "MyService" -BinaryPath "C:\MyService\myservice.exe" -Arguments "--foo --bar" -User ".\MyUser" -Password "MyPassword"
     #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
@@ -154,7 +157,7 @@ function New-WindowsService
         [string]$DisplayName = $null,
 
         [Parameter(Mandatory=$true, Position=3)]
-        [string]$BinaryPath  = $null,
+        [string]$BinaryPath  = $null,        
 
         [Parameter(Mandatory=$false, Position=4)]
         [string]$Description = $null,
@@ -169,7 +172,10 @@ function New-WindowsService
         [string]$User       = $null, # NT AUTHORITY\LocalSystem, NT AUTHORITY\LocalService, NT AUTHORITY\NetworkService, <Domain\User>
 
         [Parameter(Mandatory=$false, Position=8)]
-        [string]$Password    = $null
+        [string]$Password    = $null,
+
+        [Parameter(Mandatory=$true, Position=9)]
+        [string]$Arguments  = $null
     )
     
     Begin {
@@ -187,7 +193,7 @@ function New-WindowsService
         }
         
         # Install dotNET Service.
-        New-Service -BinaryPathName $BinaryPath -Name $ServiceName -DisplayName $DisplayName
+        New-Service -BinaryPathName $BinaryPath + " $Arguments" -Name $ServiceName -DisplayName $DisplayName
                     
         if($Description) {
             Set-Service $ServiceName -Description $Description
