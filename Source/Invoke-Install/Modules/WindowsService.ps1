@@ -193,7 +193,7 @@ function New-WindowsService
         }
         
         # Install dotNET Service.
-        New-Service -BinaryPathName $BinaryPath + " $Arguments" -Name $ServiceName -DisplayName $DisplayName
+        New-Service -BinaryPathName "$BinaryPath $Arguments" -Name $ServiceName -DisplayName $DisplayName
                     
         if($Description) {
             Set-Service $ServiceName -Description $Description
