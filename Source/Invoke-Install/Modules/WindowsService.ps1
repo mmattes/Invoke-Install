@@ -174,7 +174,7 @@ function New-WindowsService
         [Parameter(Mandatory=$false, Position=8)]
         [string]$Password    = $null,
 
-        [Parameter(Mandatory=$true, Position=9)]
+        [Parameter(Mandatory=$false, Position=9)]
         [string]$Arguments  = $null
     )
     
