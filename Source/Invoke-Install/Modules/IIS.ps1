@@ -590,7 +590,7 @@ function Add-IISServerToServerFarm
         .PARAMETER HttpPort
             Specifies the HTTP port under which the server is litening at the given ServerAddress
 
-        .PARAMETER HttpPort
+        .PARAMETER HttpsPort
             Specifies the HTTPS port under which the server is litening at the given ServerAddress
         
         .EXAMPLE
