@@ -983,3 +983,109 @@ function Use-WebAdministration () {
         Sleep 2 #see http://stackoverflow.com/questions/14862854/powershell-command-get-childitem-iis-sites-causes-an-error
     }
 }
+
+
+function Get-ServerFarm {
+    <#
+        .SYNOPSIS
+            Gets a specified ServerFarm
+        
+        .DESCRIPTION
+            Gets a specified ServerFarm
+            
+        .PARAMETER ServerFarmName
+            Specifies the name of the Server Farm you want to modify
+        
+        .EXAMPLE
+            Get-ServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName = $null
+    )
+
+    Begin {
+        $Assembly = [System.Reflection.Assembly]::LoadFrom("$Env:systemroot\system32\inetsrv\Microsoft.Web.Administration.dll")
+        $ServerManager = new-object Microsoft.Web.Administration.ServerManager "$Env:systemroot\system32\inetsrv\config\applicationhost.config"
+    }
+    
+    Process {
+        $Config = $ServerManager.GetApplicationHostConfiguration()
+        $Section = $Config.GetSection("webFarms")
+        $WebFarms = $Section.GetCollection()
+        $WebFarm = $WebFarms | Where {
+            $_.GetAttributeValue("name") -eq $ServerFarmName
+        }
+
+        return $WebFarm    
+    }
+    
+    End { 
+    }    
+}
+
+
+function Set-IISServerFarmServerAvailability {
+    <#
+        .SYNOPSIS
+            Sets the availability of a server within a server farm
+        
+        .DESCRIPTION
+            Sets the availability of a server within a server farm, possible values are
+            0 = Available
+            1 = Drain
+            2 = Unavailable
+            3 = Unavailable Gracefully
+            
+        .PARAMETER ServerFarmName
+            Specifies the name of the Server Farm you want to modify
+
+        .PARAMETER SeverAddress
+            Specifies the server address (url) of the server of which the availability should be changed
+
+        .PARAMETER Availability
+            Specifies the availability of a server within a server farm, possible values are
+            0 = Available
+            1 = Drain
+            2 = Unavailable
+            3 = Unavailable Gracefully
+        
+        .EXAMPLE
+            Set-IISServerFarmServerAvailability -ServerFarmName "MyServerFarm" -SeverAddress "server-a.myserver.com" -Availability 0
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName = $null,
+
+        [Parameter(Mandatory=$true, Position=2)]
+        [string]$SeverAddress = $null,
+
+        [Parameter(Mandatory=$true, Position=3)]
+        [int]$Availability = 0
+    )
+
+    Begin {
+        $ServerFarm = Get-ServerFarm $ServerFarmName
+        $Servers = $ServerFarm.GetCollection()
+    }
+    
+    Process {
+        if (($Availability -lt 0) -or ($Availability -gt 3)) {
+            Write-Host "Availability needs to be between 0 and 3" 
+            return
+        }
+    
+        $Server = $Servers | Where {
+            $_.GetAttributeValue("address") -eq $ServerAddress
+        }
+        
+        $arr = $Server.GetChildElement("applicationRequestRouting")
+        $MethodInstance = $arr.Methods["SetState"].CreateInstance()
+       
+        $MethodInstance.Input.Attributes[0].Value = $Availability
+        $MethodInstance.Execute()
+    }
+    
+    End { 
+    }    
+}
