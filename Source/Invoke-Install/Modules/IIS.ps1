@@ -1043,6 +1043,13 @@ function Set-IISServerFarmServerAvailability {
         .PARAMETER SeverAddress
             Specifies the server address (url) of the server of which the availability should be changed
 
+        .PARAMETER Filter
+            Specifies a filter for the name of the server ulr, all sites matching the filter will be set to the new
+            availability
+            
+        .PARAMETER Exclude
+            Specifies which sites should be excluded when using the filter parameter        
+
         .PARAMETER Availability
             Specifies the availability of a server within a server farm, possible values are
             0 = Available
@@ -1052,19 +1059,29 @@ function Set-IISServerFarmServerAvailability {
         
         .EXAMPLE
             Set-IISServerFarmServerAvailability -ServerFarmName "MyServerFarm" -SeverAddress "server-a.myserver.com" -Availability 0
+
+        .EXAMPLE
+            Set-IISServerFarmServerAvailability -ServerFarmName "MyServerFarm" -Filter "*.myserver.com" -Exclude "blue.myserver.com" -Availability 0
     #>
     param(
+        [CmdletBinding(DefaultParameterSetName='BySeverAddress')]
         [Parameter(Mandatory=$true, Position=1)]
         [string]$ServerFarmName = $null,
 
-        [Parameter(Mandatory=$true, Position=2)]
+        [Parameter(Mandatory=$true, ParameterSetName='BySeverAddress', Position=2)]
         [string]$SeverAddress = $null,
 
-        [Parameter(Mandatory=$true, Position=3)]
-        [int]$Availability = 0
+        [Parameter(Mandatory=$true, ParameterSetName='ByFilter', Position=3)]
+        [string]$Filter = $null,
+
+        [Parameter(Mandatory=$false, ParameterSetName='ByFilter', Position=4)]
+        [string]$Exclude = $null,
+
+        [Parameter(Mandatory=$true, Position=5)]
+        [int]$Availability = $null
     )
 
-    Begin {
+    Begin {        
         $ServerFarm = Get-ServerFarm $ServerFarmName
         $Servers = $ServerFarm.GetCollection()
     }
@@ -1074,16 +1091,28 @@ function Set-IISServerFarmServerAvailability {
             Write-Host "Availability needs to be between 0 and 3" 
             return
         }
-    
-        $Server = $Servers | Where {
-            $_.GetAttributeValue("address") -eq $ServerAddress
+
+        if ($PSCmdlet.ParameterSetName -eq 'BySeverAddress')
+        {
+            $Servers = $Servers | Where {
+                $_.GetAttributeValue("address") -eq $ServerAddress
+            }    
         }
+
+        if ($PSCmdlet.ParameterSetName -eq 'ByFilter')
+        {
+            $Servers = $Servers | Where {                
+                ($_.GetAttributeValue("address") -like $Filter) -and ($_.GetAttributeValue("address") -notlike $Exclude)
+            }    
+        }   
         
-        $arr = $Server.GetChildElement("applicationRequestRouting")
-        $MethodInstance = $arr.Methods["SetState"].CreateInstance()
+        foreach($server in $servers) {
+            $arr = $Server.GetChildElement("applicationRequestRouting")
+            $MethodInstance = $arr.Methods["SetState"].CreateInstance()
        
-        $MethodInstance.Input.Attributes[0].Value = $Availability
-        $MethodInstance.Execute()
+            $MethodInstance.Input.Attributes[0].Value = $Availability
+            $MethodInstance.Execute()
+        }
     }
     
     End { 
