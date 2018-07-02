@@ -983,3 +983,138 @@ function Use-WebAdministration () {
         Sleep 2 #see http://stackoverflow.com/questions/14862854/powershell-command-get-childitem-iis-sites-causes-an-error
     }
 }
+
+
+function Get-ServerFarm {
+    <#
+        .SYNOPSIS
+            Gets a specified ServerFarm
+        
+        .DESCRIPTION
+            Gets a specified ServerFarm
+            
+        .PARAMETER ServerFarmName
+            Specifies the name of the Server Farm you want to modify
+        
+        .EXAMPLE
+            Get-ServerFarm -ServerFarmName "MyServerFarm"
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName = $null
+    )
+
+    Begin {
+        $Assembly = [System.Reflection.Assembly]::LoadFrom("$Env:systemroot\system32\inetsrv\Microsoft.Web.Administration.dll")
+        $ServerManager = new-object Microsoft.Web.Administration.ServerManager "$Env:systemroot\system32\inetsrv\config\applicationhost.config"
+    }
+    
+    Process {
+        $Config = $ServerManager.GetApplicationHostConfiguration()
+        $Section = $Config.GetSection("webFarms")
+        $WebFarms = $Section.GetCollection()
+        $WebFarm = $WebFarms | Where {
+            $_.GetAttributeValue("name") -eq $ServerFarmName
+        }
+
+        return $WebFarm    
+    }
+    
+    End { 
+    }    
+}
+
+
+function Set-IISServerFarmServerAvailability {
+    <#
+        .SYNOPSIS
+            Sets the availability of a server within a server farm
+        
+        .DESCRIPTION
+            Sets the availability of a server within a server farm, possible values are
+            0 = Available
+            1 = Drain
+            2 = Unavailable
+            3 = Unavailable Gracefully
+            
+        .PARAMETER ServerFarmName
+            Specifies the name of the Server Farm you want to modify
+
+        .PARAMETER SeverAddress
+            Specifies the server address (url) of the server of which the availability should be changed
+
+        .PARAMETER Filter
+            Specifies a filter for the name of the server ulr, all sites matching the filter will be set to the new
+            availability
+            
+        .PARAMETER Exclude
+            Specifies which sites should be excluded when using the filter parameter        
+
+        .PARAMETER Availability
+            Specifies the availability of a server within a server farm, possible values are
+            0 = Available
+            1 = Drain
+            2 = Unavailable
+            3 = Unavailable Gracefully
+        
+        .EXAMPLE
+            Set-IISServerFarmServerAvailability -ServerFarmName "MyServerFarm" -SeverAddress "server-a.myserver.com" -Availability 0
+
+        .EXAMPLE
+            Set-IISServerFarmServerAvailability -ServerFarmName "MyServerFarm" -Filter "*.myserver.com" -Exclude "blue.myserver.com" -Availability 0
+    #>
+    param(
+        [CmdletBinding(DefaultParameterSetName='BySeverAddress')]
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$ServerFarmName = $null,
+
+        [Parameter(Mandatory=$true, ParameterSetName='BySeverAddress', Position=2)]
+        [string]$SeverAddress = $null,
+
+        [Parameter(Mandatory=$true, ParameterSetName='ByFilter', Position=3)]
+        [string]$Filter = $null,
+
+        [Parameter(Mandatory=$false, ParameterSetName='ByFilter', Position=4)]
+        [string]$Exclude = $null,
+
+        [Parameter(Mandatory=$true, Position=5)]
+        [int]$Availability = $null
+    )
+
+    Begin {        
+        $ServerFarm = Get-ServerFarm $ServerFarmName
+        $Servers = $ServerFarm.GetCollection()
+    }
+    
+    Process {
+        if (($Availability -lt 0) -or ($Availability -gt 3)) {
+            Write-Host "Availability needs to be between 0 and 3" 
+            return
+        }
+
+        if ($PSCmdlet.ParameterSetName -eq 'BySeverAddress')
+        {
+            $Servers = $Servers | Where {
+                $_.GetAttributeValue("address") -eq $ServerAddress
+            }    
+        }
+
+        if ($PSCmdlet.ParameterSetName -eq 'ByFilter')
+        {
+            $Servers = $Servers | Where {                
+                ($_.GetAttributeValue("address") -like $Filter) -and ($_.GetAttributeValue("address") -notlike $Exclude)
+            }    
+        }   
+        
+        foreach($server in $servers) {
+            $arr = $Server.GetChildElement("applicationRequestRouting")
+            $MethodInstance = $arr.Methods["SetState"].CreateInstance()
+       
+            $MethodInstance.Input.Attributes[0].Value = $Availability
+            $MethodInstance.Execute()
+        }
+    }
+    
+    End { 
+    }    
+}

@@ -41,6 +41,8 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 Remove-IISServerFromServerFarm
 
+* 1.6.1
+    * ADD: Set-IISServerFarmServerAvailability to set the availability/state of a server within a server farm
 * 1.5.1
     * ADD: Set-IISAppPoolConfig to set some config parameters of AppPools
 * 1.4.1
