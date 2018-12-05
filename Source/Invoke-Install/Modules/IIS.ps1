@@ -1118,3 +1118,55 @@ function Set-IISServerFarmServerAvailability {
     End { 
     }    
 }
+
+
+function Use-IISAdministration {
+    <#
+        .SYNOPSIS
+            Loads the IISAdministration Module if it is not already loaded
+        
+        .DESCRIPTION
+            Loads the IISAdministration Module if it is not already loaded
+        
+        .EXAMPLE
+            Use-IISAdministration
+    #>
+
+    if (!(Get-Module -ListAvailable -Name IISAdministration)) {
+        Install-Module IISAdministration -Force
+    } 
+
+    if (!(Get-Module IISAdministration))
+    {
+        ## Load it nested, and we'll automatically remove it during clean up.
+        Import-Module IISAdministration -ErrorAction Stop
+    }
+}
+
+
+function Get-IISVersion
+{
+    <#
+        .SYNOPSIS
+            Gets the Version from the installed IIS Server
+        
+        .DESCRIPTION
+            Gets the Version as System.Version Object from the installed IIS Server
+        
+        .EXAMPLE
+            Get-IISVersion
+    #>
+    Begin {
+        [System.Version]$Version = $null
+    }
+    
+    Process {
+        # TODO: verify what happens if IIS is not installed?
+        $IISInfo = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\InetStp' | select InstallPath, VersionString, @{n="ProductVersion";e={(Get-ItemProperty ($_.InstallPath + "\w3wp.exe")).VersionInfo.ProductVersion}}
+        $Version = $IISInfo.ProductVersion
+    }
+    
+    End { 
+        return $Version
+    }
+}
