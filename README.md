@@ -42,6 +42,7 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 * 1.7.1
     * ADD: Use-IISAdministration loads the IISAdministration Module if it is not already loaded
     * ADD: Get-IISVersion gets the Version as System.Version Object from the installed IIS Server
+    * ADD: Get-WindowsReleaseId gets the Windwos ReleaseId e.g. 1809
 * 1.6.1
     * ADD: Set-IISServerFarmServerAvailability to set the availability/state of a server within a server farm
 * 1.5.1
