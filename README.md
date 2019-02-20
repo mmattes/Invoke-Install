@@ -39,6 +39,8 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+* 1.7.2
+    CHANGE: Set-IISSiteHSTS, Parameters Enabled and MaxAge are not mandatory 
 * 1.7.1
     * ADD: Use-IISAdministration loads the IISAdministration Module if it is not already loaded
     * ADD: Get-IISVersion gets the Version as System.Version Object from the installed IIS Server
