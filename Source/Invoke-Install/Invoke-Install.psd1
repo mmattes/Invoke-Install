@@ -82,7 +82,8 @@ FunctionsToExport = 'Invoke-Install', 'Remove-Directory', 'New-WindowsTask',
                'Add-WindowsHostsRecord', 'Remove-WindowsHostsRecord', 
                'Remove-IISServerFromServerFarm', 'Use-SqlServerModule', 
                'Update-SqlDatabase', 'Get-SqlUpdateScript', 'Set-IISAppPoolConfig',
-               'Set-IISServerFarmServerAvailability'
+               'Set-IISServerFarmServerAvailability', 'Use-IISAdministration', 'Get-IISVersion', 
+               'Get-WindowsReleaseId', 'Set-IISSiteHSTS'
                
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -108,7 +109,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'Continous','Integration','Deployment','Deploy','Installatoin','DevOps','Install'
+        Tags = 'Continous','Integration','Deployment','Deploy','Installation','DevOps','Install'
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/mmattes/Invoke-Install/LICENSE.md'

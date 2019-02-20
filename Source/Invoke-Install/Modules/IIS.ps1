@@ -590,7 +590,7 @@ function Add-IISServerToServerFarm
         .PARAMETER HttpPort
             Specifies the HTTP port under which the server is litening at the given ServerAddress
 
-        .PARAMETER HttpPort
+        .PARAMETER HttpsPort
             Specifies the HTTPS port under which the server is litening at the given ServerAddress
         
         .EXAMPLE
@@ -1117,4 +1117,111 @@ function Set-IISServerFarmServerAvailability {
     
     End { 
     }    
+}
+
+
+function Use-IISAdministration {
+    <#
+        .SYNOPSIS
+            Loads the IISAdministration Module if it is not already loaded
+        
+        .DESCRIPTION
+            Loads the IISAdministration Module if it is not already loaded
+        
+        .EXAMPLE
+            Use-IISAdministration
+    #>
+
+    if (!(Get-Module -ListAvailable -Name IISAdministration)) {
+        Install-Module IISAdministration -Force
+    } 
+
+    if (!(Get-Module IISAdministration))
+    {
+        ## Load it nested, and we'll automatically remove it during clean up.
+        Import-Module IISAdministration -ErrorAction Stop
+    }
+}
+
+
+function Get-IISVersion
+{
+    <#
+        .SYNOPSIS
+            Gets the Version from the installed IIS Server
+        
+        .DESCRIPTION
+            Gets the Version as System.Version Object from the installed IIS Server
+        
+        .EXAMPLE
+            Get-IISVersion
+    #>
+    Begin {
+        [System.Version]$Version = $null
+    }
+    
+    Process {
+        # TODO: verify what happens if IIS is not installed?
+        $IISInfo = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\InetStp' | select InstallPath, VersionString, @{n="ProductVersion";e={(Get-ItemProperty ($_.InstallPath + "\w3wp.exe")).VersionInfo.ProductVersion}}
+        $Version = $IISInfo.ProductVersion
+    }
+    
+    End { 
+        return $Version
+    }
+}
+
+function Set-IISSiteHSTS
+{
+    <#
+        .SYNOPSIS
+            Gets the ReleaseId from Windows
+        
+        .DESCRIPTION
+            Gets the ReleaseId from Windows and returns it as an int
+        
+        .EXAMPLE
+            Get-WindowsReleaseId 
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]  $SiteName     = $null,
+
+        [Parameter(Mandatory=$true, Position=2)]
+        [bool]  $Enabled     = $true,
+
+        [Parameter(Mandatory=$true, Position=3)]
+        [int]  $MaxAge     = 31536000        
+    )
+    
+    Begin {
+        $NativeSupport = $false
+        $IISVersion = Get-IISVersion 
+        if(($IISVersion.Major -ge 10) -and (Get-WindowsReleaseId -ge 1709) ) {
+            $NativeSupport = $true
+        }
+    }
+    
+    Process {
+        if($NativeSupport) {
+            Use-IISAdministration 
+            Reset-IISServerManager -Confirm:$false
+            Start-IISCommitDelay
+
+            $sitesCollection = Get-IISConfigSection -SectionPath "system.applicationHost/sites" | Get-IISConfigCollection
+            $siteElement = Get-IISConfigCollectionElement -ConfigCollection $sitesCollection -ConfigAttribute @{"name"=$SiteName}
+            $hstsElement = Get-IISConfigElement -ConfigElement $siteElement -ChildElementName "hsts"
+            Set-IISConfigAttributeValue -ConfigElement $hstsElement -AttributeName "enabled" -AttributeValue $Enabled
+            Set-IISConfigAttributeValue -ConfigElement $hstsElement -AttributeName "max-age" -AttributeValue $MaxAge
+            Set-IISConfigAttributeValue -ConfigElement $hstsElement -AttributeName "redirectHttpToHttps" -AttributeValue $true
+
+            Stop-IISCommitDelay
+        } else {
+            Write-Log "Not yet supported for IIS Versions lower then 10 Release 1709" -LogLevel Error
+        }
+    }
+    
+    End { 
+        
+    }
 }

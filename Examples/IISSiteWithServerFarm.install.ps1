@@ -82,15 +82,17 @@ Add-WebConfiguration -Value @{Name="ASPNETCORE_ENVIRONMENT"; Value=$ENV:Environm
 Start-Website -Name $SiteName
 
 # We set a global URL Rewrite from our URL to the Server Farm which then deals with all requests, the URL for a server farm is http://SERVERFARMNAME or https://SERVERFARMNAME
-Add-IISGlobalRouting -RuleName "Rewrite $Url to ServerFarm $ServerFarmName" -MatchUrl ".*" -Conditions @(@{"input"="{HTTP_HOST}"; "pattern"="^$Url$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"}) -Action @{"type"="Rewrite";url="http://$ServerFarmName/{R:0}"} -StopProcessing $false
+Add-IISGlobalRouting -RuleName "Rewrite $($Url) to ServerFarm $($ServerFarmName)" -MatchUrl ".*" -Conditions @(@{"input"="{HTTP_HOST}"; "pattern"="^$Url$"},@{"input"="{SERVER_PORT}"; "pattern"="^80$"}) -Action @{"type"="Rewrite";url="http://$ServerFarmName/{R:0}"} -StopProcessing $false
 
 # Create Server Farm will only create a new one if it does not exist so we can run it every time
-Create-IISServerFarm -ServerFarmName "$ServerFarmName"
-Set-IISServerFarmhealthCheck -ServerFarmName "$ServerFarmName" -Url "http://$Url/up.html" -ResponseMatch "up"
+Create-IISServerFarm -ServerFarmName $ServerFarmName
+Set-IISServerFarmhealthCheck -ServerFarmName $ServerFarmName -Url "http://$Url/up.html" -ResponseMatch "up"
 
 # Now we add a new enty pointing to 127.0.0.1 to the local hosts file of windows so that we do not need to worry
 # about network wide dns resolution
 Add-WindowsHostsRecord -DnsName $UrlWithGuid -IPAddress "127.0.0.1"
-Add-IISServerToServerFarm -ServerFarmName "$ServerFarmName" -ServerAddress $UrlWithGuid -HttpPort $Port
+Add-IISServerToServerFarm -ServerFarmName $ServerFarmName -ServerAddress $UrlWithGuid -HttpPort $Port
+
+Set-IISServerFarmServerAvailability -ServerFarmName $ServerFarmName -Filter "*.$($Url)" -Exclude $UrlWithGuid -Availability 1
 
 #Todo: disable / remove old servers / releases
