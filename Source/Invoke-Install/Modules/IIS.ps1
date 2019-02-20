@@ -1203,7 +1203,8 @@ function Set-IISSiteHSTS
     Begin {
         $NativeSupport = $false
         $IISVersion = Get-IISVersion 
-        if(($IISVersion.Major -ge 10) -and (Get-WindowsReleaseId -ge 1709) ) {
+        $WinVer = Get-WindowsReleaseId
+        if(($IISVersion.Major -ge 10) -and ($WinVer -ge 1709) ) {
             $NativeSupport = $true
         }
     }
