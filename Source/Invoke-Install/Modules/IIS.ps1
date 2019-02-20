@@ -1175,22 +1175,28 @@ function Set-IISSiteHSTS
 {
     <#
         .SYNOPSIS
-            Gets the ReleaseId from Windows
+            Sets HSTS on an IIS Site specified
         
         .DESCRIPTION
-            Gets the ReleaseId from Windows and returns it as an int
+            Sets HSTS on an IIS Site specified, currently only works for IIS 10 Release 1709 
         
         .EXAMPLE
-            Get-WindowsReleaseId 
+            Set-IISSiteHSTS -SiteName "MySite"
+
+        .EXAMPLE
+            Set-IISSiteHSTS -SiteName "MySite" -Enabled $false
+
+        .EXAMPLE
+            Set-IISSiteHSTS -SiteName "MySite" -MaxAge 2456000
     #>
     param(
         [Parameter(Mandatory=$true, Position=1)]
         [string]  $SiteName     = $null,
 
-        [Parameter(Mandatory=$true, Position=2)]
+        [Parameter(Mandatory=$false, Position=2)]
         [bool]  $Enabled     = $true,
 
-        [Parameter(Mandatory=$true, Position=3)]
+        [Parameter(Mandatory=$false, Position=3)]
         [int]  $MaxAge     = 31536000        
     )
     
