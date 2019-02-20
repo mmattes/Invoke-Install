@@ -1203,7 +1203,8 @@ function Set-IISSiteHSTS
     Begin {
         $NativeSupport = $false
         $IISVersion = Get-IISVersion 
-        if(($IISVersion.Major -ge 10) -and (Get-WindowsReleaseId -ge 1709) ) {
+        $WinVer = Get-WindowsReleaseId
+        if(($IISVersion.Major -ge 10) -and ($WinVer -ge 1709) ) {
             $NativeSupport = $true
         }
     }
@@ -1223,7 +1224,38 @@ function Set-IISSiteHSTS
 
             Stop-IISCommitDelay
         } else {
-            Write-Log "Not yet supported for IIS Versions lower then 10 Release 1709" -LogLevel Error
+            Use-WebAdministration
+            
+            $Name = "Rewrite HTTP to HTTPS"
+            $Root = 'system.webServer/rewrite/rules'
+            $Filter = "{0}/rule[@name='{1}']" -f $Root, $Name
+            
+            Add-WebConfigurationProperty -Name '.' -Value @{name="$($Name)"; stopProcessing="true";} -Filter $Root -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name "url" -Value "(.*)" -Filter "$Filter/match" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name '.' -Value @{input='{HTTPS}'; pattern="off";} -Filter "$Filter/conditions" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name 'type' -Value 'Redirect' -Filter "$Filter/action" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name 'url' -value 'https://{HTTP_HOST}/{R:1}' -Filter "$Filter/action" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name 'redirectType' -Value 'Permanent' -Filter "$Filter/action" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            
+            $Name = "Add Strict-Transport-Security when HTTPS"
+            
+            $Root = 'system.webServer/rewrite/outboundRules'
+            $Filter = "{0}/rule[@name='{1}']" -f $Root, $Name
+            Add-WebConfigurationProperty -Name '.' -Value @{name="$($Name)";} -Filter $Root -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name "serverVariable" -Value "RESPONSE_Strict_Transport_Security" -Filter "$Filter/match" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name "pattern" -Value ".*" -Filter "$Filter/match" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name 'type' -Value 'Rewrite' -Filter "$Filter/action" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            Set-WebConfigurationProperty -Name 'value' -Value "max-age=$MaxAge" -Filter "$Filter/action" -PSPath "MACHINE/WEBROOT/APPHOST" -Location "$SiteName"
+            
+            $list = @{
+             filter = "$Filter/conditions"
+             Value = @{
+                input = '{HTTPS}'
+                pattern = 'on'
+                }
+            }
+            
+            Add-WebConfiguration @list -PSPath MACHINE/WEBROOT/APPHOST -Location $SiteName
         }
     }
     

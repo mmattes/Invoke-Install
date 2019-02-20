@@ -39,6 +39,8 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+* 1.8.1
+    ADD: Set-IISSiteHSTS now supports IIS Versions lower 10 Build 1709, this way needs the URL Rewrite module
 * 1.7.2
     CHANGE: Set-IISSiteHSTS, Parameters Enabled and MaxAge are not mandatory 
 * 1.7.1
