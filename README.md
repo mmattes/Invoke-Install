@@ -39,6 +39,8 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+* 1.9.1
+    ADD: Use-MicrosoftSqlServerDac is available external now as it is needed if DacDeployOptions need to be specified
 * 1.8.1
     ADD: Set-IISSiteHSTS now supports IIS Versions lower 10 Build 1709, this way needs the URL Rewrite module
 * 1.7.2
