@@ -29,7 +29,7 @@ function Stop-WindowsService
     
     Process {
         # Verify if the service exists, and if yes stop it and wait for new state.
-        if(Assert-ServiceExists $Name) {            
+        if(Assert-ServiceExists $Name) {
             $Service = Get-Service $Name | Where-Object {$_.status -eq 'Running'}
 
             if ($Service) {
@@ -356,7 +356,7 @@ function Assert-ServiceExists {
     if (Get-Service "$Name*" -Include $Name) {
         return $true
     }
-    Write-Log "The Service $Name does not Exist" -LogLevel "Error"
+    Write-Log "The Service $Name does not Exist" -LogLevel "Information"
     
     return $false
 }
