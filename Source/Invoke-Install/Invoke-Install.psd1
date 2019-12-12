@@ -12,7 +12,7 @@
 RootModule = 'Invoke-Install.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.9.2'
+ModuleVersion = '1.10.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -84,7 +84,7 @@ FunctionsToExport = 'Invoke-Install', 'Remove-Directory', 'New-WindowsTask',
                'Update-SqlDatabase', 'Get-SqlUpdateScript', 'Set-IISAppPoolConfig', 
                'Set-IISServerFarmServerAvailability', 'Use-IISAdministration', 
                'Get-IISVersion', 'Get-WindowsReleaseId', 'Set-IISSiteHSTS', 
-               'Use-MicrosoftSqlServerDac'
+               'Use-MicrosoftSqlServerDac', 'Remove-IISApplication', 'Create-IISApplication'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
