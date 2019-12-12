@@ -1264,7 +1264,7 @@ function Set-IISSiteHSTS
     }
 }
 
-function Create-IISApplication
+function New-IISApplication
 {
     <#
         .SYNOPSIS
@@ -1274,7 +1274,7 @@ function Create-IISApplication
             Creates a new IIS Application within an already existing site
         
         .EXAMPLE
-            Create-IISApplication -Site "MySite" -AppName "MyApp" -Root "C:\myapp" -AppPool "MyAppAppPool"
+            New-IISApplication -Site "MySite" -AppName "MyApp" -Root "C:\myapp" -AppPool "MyAppAppPool"
     #>
     param(
         [Parameter(Mandatory=$true, Position=1)]

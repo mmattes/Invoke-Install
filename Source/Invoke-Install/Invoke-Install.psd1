@@ -85,7 +85,7 @@ FunctionsToExport = 'Invoke-Install', 'Remove-Directory', 'New-WindowsTask',
                'Set-IISServerFarmServerAvailability', 'Use-IISAdministration', 
                'Get-IISVersion', 'Get-WindowsReleaseId', 'Set-IISSiteHSTS', 
                'Use-MicrosoftSqlServerDac', 'Remove-IISApplication', 
-               'Create-IISApplication'
+               'New-IISApplication'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
