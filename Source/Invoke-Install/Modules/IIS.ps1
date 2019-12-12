@@ -1263,3 +1263,85 @@ function Set-IISSiteHSTS
         
     }
 }
+
+function Create-IISApplication
+{
+    <#
+        .SYNOPSIS
+            Creates a new IIS Application within an already existing site
+        
+        .DESCRIPTION
+            Creates a new IIS Application within an already existing site
+        
+        .EXAMPLE
+            Create-IISApplication -Site "MySite" -AppName "MyApp" -Root "C:\myapp" -AppPool "MyAppAppPool"
+    #>
+    param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$Site       = $null,
+
+        [Parameter(Mandatory=$true, Position=2)]
+        [string]$AppName       = $null,
+
+        [Parameter(Mandatory=$true, Position=3)]
+        [string]$Root       = $null,
+
+        [Parameter(Mandatory=$true, Position=4)]
+        [string]$AppPool    = $null
+    )
+    
+    Begin{
+
+    }
+    
+    Process
+    {
+        Write-Log "Creating IIS Application: $name"
+        
+        New-WebApplication -Name $AppName -Site $Site -PhysicalPath $Root -ApplicationPool $AppPool
+    }
+    
+    End {
+
+    }
+}
+
+function Remove-IISApplication
+{
+    <#
+        .SYNOPSIS
+            Removes an IIS Application within an already existing site
+        
+        .DESCRIPTION
+            Removes an IIS Application within an already existing site
+        
+        .EXAMPLE
+            Remove-IISApplication -Site "MySite" -AppName "MyApp"
+    #>
+    Param(
+        [Parameter(Mandatory=$true, Position=1)]
+        [string]$Site       = $null,
+
+        [Parameter(Mandatory=$true, Position=2)]
+        [string]$AppName       = $null
+    )
+    
+    Begin {
+        # IIS Directory Settings
+        [string]$IisApp  = "IIS:\Sites\$($Site)\$($AppName)\"
+    }
+    
+    Process {
+        # Remove Application
+        if(Test-Path $IisApp)
+        {
+            Write-Log "Removing IIS Application: $AppName"
+            
+            Remove-WebApplication -AppName $AppName -Site $Site
+        }        
+    }
+    
+    End {
+
+    }
+}
