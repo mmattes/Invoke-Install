@@ -39,9 +39,11 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+* 1.10.2
+    * CHANGE: Create-IISApplication got renamed to New-IISApplication as Create is a not allwoed verb in powershell
 * 1.10.1
-    ADD: Create-IISApplication to add an IIS Applilcation to an existing site 
-    ADD: Remove-IISApplication to remove an IIS Applilcation to an existing site 
+    * ADD: Create-IISApplication to add an IIS Applilcation to an existing site 
+    * ADD: Remove-IISApplication to remove an IIS Applilcation to an existing site 
 * 1.9.1
     ADD: Use-MicrosoftSqlServerDac is available external now as it is needed if DacDeployOptions need to be specified
 * 1.8.1
