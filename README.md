@@ -39,6 +39,8 @@ Check out the Examples in ``Examples/`` to see what currently can be done with I
 
 ## Release History
 
+* 1.10.3
+    * CHANGE: Added some logging before and after executing a script including execution time
 * 1.10.2
     * CHANGE: Create-IISApplication got renamed to New-IISApplication as Create is a not allwoed verb in powershell
 * 1.10.1
