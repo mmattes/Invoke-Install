@@ -32,9 +32,10 @@ function Invoke-Install {
     foreach ($Script in $InstallScripts) {
         $StartDateTime = Get-date -Format u
         
-        Write-Log "====================================================================================="
+        Write-Log ""
+        Write-Log ""
         Write-Log "$StartDateTime | Starting install Script: $Script"
-        Write-Log "====================================================================================="
+        Write-Log "----"
                 
         . $Script
         $Count += 1
@@ -42,10 +43,9 @@ function Invoke-Install {
         $FinishDateTime = Get-date -Format u
         $ExecutionTime = New-TimeSpan -Start $StartDateTime -End $FinishDateTime
         $ExecutionTime = $ExecutionTime.ToString("G")
-        
-        Write-Log "====================================================================================="
-        Write-Log "$FinishDateTime | Finished install Script: $Script, Execution Time: $ExecutionTime"
-        Write-Log "====================================================================================="
+
+        Write-Log "----"
+        Write-Log "$FinishDateTime | Finished install Script: $Script, Execution Time: $ExecutionTime"        
     }
 
     return $Count
