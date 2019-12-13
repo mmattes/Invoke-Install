@@ -32,8 +32,7 @@ function Invoke-Install {
     foreach ($Script in $InstallScripts) {
         $StartDateTime = Get-date -Format u
         
-        Write-Log ""
-        Write-Log ""
+        Write-Log "`n`n"        
         Write-Log "$StartDateTime | Starting install Script: $Script"
         Write-Log "----"
                 
