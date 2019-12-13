@@ -149,7 +149,7 @@ function Remove-WindowsTask
             Host on which the task should be deleted
 
         .EXAMPLE
-            New-WindowsTask -TaskName "MyTask" -TaskPath "MyPath/MyTasks" -Action -Trigger
+            Remove-WindowsTask -TaskName "MyTask" -TaskPath "MyPath/MyTasks"
     #>
     param(        
         [Parameter(Mandatory=$true, Position=1)]
