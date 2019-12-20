@@ -12,7 +12,7 @@
 RootModule = 'Invoke-Install.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.10.7'
+ModuleVersion = '1.10.8'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
