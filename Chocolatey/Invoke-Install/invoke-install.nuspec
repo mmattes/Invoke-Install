@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Read this before creating packages: https://chocolatey.org/docs/create-packages -->
+<!-- It is especially important to read the above link to understand additional requirements when publishing packages to the community feed aka dot org (https://chocolatey.org/packages). -->
+
+<!-- Test your packages in a test environment: https://github.com/chocolatey/chocolatey-test-environment -->
+
+<!--
+This is a nuspec. It mostly adheres to https://docs.nuget.org/create/Nuspec-Reference. Chocolatey uses a special version of NuGet.Core that allows us to do more than was initially possible. As such there are certain things to be aware of:
+
+* the package xmlns schema url may cause issues with nuget.exe
+* Any of the following elements can ONLY be used by choco tools - projectSourceUrl, docsUrl, mailingListUrl, bugTrackerUrl, packageSourceUrl, provides, conflicts, replaces 
+* nuget.exe can still install packages with those elements but they are ignored. Any authoring tools or commands will error on those elements 
+-->
+
+<!-- You can embed software files directly into packages, as long as you are not bound by distribution rights. -->
+<!-- * If you are an organization making private packages, you probably have no issues here -->
+<!-- * If you are releasing to the community feed, you need to consider distribution rights. -->
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <!-- This section is about this package, although id and version have ties back to the software -->
+    <!-- id is lowercase and if you want a good separator for words, use '-', not '.'. Dots are only acceptable as suffixes for certain types of packages, e.g. .install, .portable, .extension, .template -->
+    <!-- If the software is cross-platform, attempt to use the same id as the debian/rpm package(s) if possible. -->
+    <id>Invoke-Install</id>
+    <!-- version should MATCH as closely as possible with the underlying software -->
+    <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
+    <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
+    <version>1.10.4</version>
+    <!-- <packageSourceUrl>Where is this Chocolatey package located (think GitHub)? packageSourceUrl is highly recommended for the community feed</packageSourceUrl>-->
+    <!-- owners is a poor name for maintainers of the package. It sticks around by this name for compatibility reasons. It basically means you. -->
+    <!--<owners>__REPLACE_YOUR_NAME__</owners>-->
+    <!-- ============================== -->
+
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <!-- This section is about the software itself -->
+    <title>Invoke-Install (PowerShell Module)</title>
+    <authors>Markus Mattes</authors>
+    <!-- projectUrl is required for the community feed -->
+    <projectUrl>https://github.com/mmattes/Invoke-Install</projectUrl>
+    <!--<iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/invoke-install.png</iconUrl>-->
+    <!-- <copyright>Year Software Vendor</copyright> -->
+    <!-- If there is a license Url available, it is required for the community feed -->
+    <licenseUrl>https://github.com/mmattes/Invoke-Install/blob/develop/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/mmattes/Invoke-Install</projectSourceUrl>
+    <docsUrl>https://github.com/mmattes/Invoke-Install</docsUrl>
+    <!--<mailingListUrl></mailingListUrl>-->
+    <bugTrackerUrl>https://github.com/mmattes/Invoke-Install</bugTrackerUrl>
+    <tags>invoke-install Continous Integration Continous-Integration Deployment Deploy Installation DevOps Install</tags>
+    <summary>Module to simplify PowerShell installations. More info on Github</summary>
+    <description><![CDATA[[![Build status](https://ci.appveyor.com/api/projects/status/vjynfakil886epi1/branch/master?svg=true)](https://ci.appveyor.com/project/mmattes/invoke-install/branch/master)
+
+Module to simplify PowerShell installations
+
+### Description 
+
+Invoke-Install is inspired by PSDeploy and Invoke-Build but rather then using a specific script language/format it just uses Powershell scripts and runs them. Imaging you have an application which comes with several independent services/modules/apis and all of them somehow need to be installed. Rather then having one large installation script for all services/modules/apis you will create independet ```*.install.ps1``` files which all will complete an independent installation.
+
+Invoke-Install comes with special Modules for more complicated tasks so that anything what needs to be done is a one liner. 
+
+The idea is that any ```*.install.ps1``` is plain simple and straight forward understandable, they should not contain functions or a lot of switches or if, loops. 
+
+### Installing
+
+```ps
+Install-Module Invoke-Install
+
+```
+
+### Usage
+
+Execute the following command to runn all ```*.install.ps1``` files within the same directory
+
+```ps
+Invoke-Install .
+
+```
+
+or specify a specific ```*.install.ps1``` to be used. 
+
+```ps
+Invoke-Install MyApp.install.ps1
+
+```
+
+Check out the Examples in ``Examples/`` to see what currently can be done with Invoke-Install. Feel free to contribute and add more Modules. 
+
+## Release History
+
+* 1.10.3
+    * CHANGE: Added some logging before and after executing a script including execution time
+* 1.10.2
+    * CHANGE: Create-IISApplication got renamed to New-IISApplication as Create is a not allwoed verb in powershell
+* 1.10.1
+    * ADD: Create-IISApplication to add an IIS Applilcation to an existing site 
+    * ADD: Remove-IISApplication to remove an IIS Applilcation to an existing site 
+* 1.9.1
+    ADD: Use-MicrosoftSqlServerDac is available external now as it is needed if DacDeployOptions need to be specified
+* 1.8.1
+    ADD: Set-IISSiteHSTS now supports IIS Versions lower 10 Build 1709, this way needs the URL Rewrite module
+* 1.7.2
+    CHANGE: Set-IISSiteHSTS, Parameters Enabled and MaxAge are not mandatory 
+* 1.7.1
+    * ADD: Use-IISAdministration loads the IISAdministration Module if it is not already loaded
+    * ADD: Get-IISVersion gets the Version as System.Version Object from the installed IIS Server
+    * ADD: Get-WindowsReleaseId gets the Windwos ReleaseId e.g. 1809
+    * ADD: Set-IISSiteHSTS enables HSTS on a IIS Site
+* 1.6.1
+    * ADD: Set-IISServerFarmServerAvailability to set the availability/state of a server within a server farm
+* 1.5.1
+    * ADD: Set-IISAppPoolConfig to set some config parameters of AppPools
+* 1.4.1
+	* ADD: Use-SqlServerModule to install and load the SqlServerModule
+	* ADD: Update-SqlDatabase updates a sqldatabase using a dacpac file 
+	* ADD: Get-SqlUpdateScript generates a sql update script for a sqldatabase using a dacpac file
+* 1.3.1
+	* ADD: Remove-IISServerFromServerFarm to remove on or more severs from a server farm
+* 1.2.1
+    * CHANGE: Remove-IISWebsite has now a filter and exculde parameter to delete multiple items at once
+    * CHANGE: Remove-IISApplicationPool has now a filter and exculde parameter to delete multiple items at once
+* 1.1.1
+    * ADD: Get-ShortGUID, Get-FreePortFromRange, Remove-IISServerFarm, Add-IISServerToServerFarm, Set-IISServerFarmServerState, Set-IISServerFarmHealthCheck, Add-IISGlobalRouting, Add-WindowsHostsRecord, Remove-WindowsHostsRecord
+    * ADD: [IIS Server Farm sample](Examples/IISSiteWithServerFarm.install.ps1)
+* 1.0.1
+    * First propper release
+
+## Contributing
+
+Please read [CONTRIBUTING.md](Doc/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning.
+
+## Authors
+
+* **Markus Mattes** - *Initial work* - [mmattes](https://github.com/mmattes)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* Inspiration 
+    * [PSDeploy](https://github.com/RamblingCookieMonster/PSDeploy)
+    * [InvokeBuild](https://github.com/nightroman/Invoke-Build)
+]]></description>
+    <releaseNotes>https://github.com/mmattes/Invoke-Install</releaseNotes>
+    <!-- =============================== -->      
+
+    <!-- Specifying dependencies and version ranges? https://docs.nuget.org/create/versioning#specifying-version-ranges-in-.nuspec-files -->
+    <!--<dependencies>
+      <dependency id="" version="__MINIMUM_VERSION__" />
+      <dependency id="" version="[__EXACT_VERSION__]" />
+      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_INCLUSIVE]" />
+      <dependency id="" version="[_MIN_VERSION_INCLUSIVE, MAX_VERSION_EXCLUSIVE)" />
+      <dependency id="" />
+      <dependency id="chocolatey-core.extension" version="1.1.0" />
+    </dependencies>-->
+    <!-- chocolatey-core.extension - https://chocolatey.org/packages/chocolatey-core.extension
+         - You want to use Get-UninstallRegistryKey on less than 0.9.10 (in chocolateyUninstall.ps1)
+         - You want to use Get-PackageParameters and on less than 0.11.0
+         - You want to take advantage of other functions in the core community maintainer's team extension package
+    -->
+
+    <!--<provides>NOT YET IMPLEMENTED</provides>-->
+    <!--<conflicts>NOT YET IMPLEMENTED</conflicts>-->
+    <!--<replaces>NOT YET IMPLEMENTED</replaces>-->
+  </metadata>
+  <files>
+    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <file src="tools\**" target="tools" />
+    <!--Building from Linux? You may need this instead: <file src="tools/**" target="tools" />-->
+  </files>
+</package>
