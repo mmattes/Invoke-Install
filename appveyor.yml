@@ -13,11 +13,19 @@ skip_commits:
   message: /updated readme.*|update readme.*s|update docs.*|update version.*|update appveyor.*/
 
 # Publish to PowerShell Gallery with this key
-environment:
+environment:  
   NuGetApiKey:
     secure: AZ37p+H63dtSWUV6jbQg6s8PDNEDpF8ApLFqwc665zRy4dgUdCA5lVkawzaIHUnr
   GitHubKey:
     secure: UwnxudS5HgpMcO685izeyD4HbG0Q7RPmfcURwAkd7V+l1/qpL4vEky5Nzl1XD/iL
+
+  # Chocolatey API key - to push updated packages
+  api_key:
+    secure:  is6GZLWWUh7JiTH6XwL/GSWTET13xToActqLpNgh8ADSTHSHhsf4NTw4vxwZe7lB
+
+  # Set au version to use or omit to use the latest. Specify branch name to use development version from Github
+  au_version:
+  au_push: true
 
 # Allow WMF5 (i.e. PowerShellGallery functionality)
 os: WMF 5
@@ -47,3 +55,4 @@ deploy_script:
   - git config --global user.email "mmattes87@gmail.comm"
   - git config --global user.name "Markus Mattes"
   - ps: . .\Build\deploy.ps1
+  - ps: . .\Build\deploy_chocolatey.ps1
