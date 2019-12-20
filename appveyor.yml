@@ -40,6 +40,7 @@ install:
 - ps: |
     Install-PackageProvider -Name NuGet -MinimumVersion '2.8.5.201' -Force -Verbose
     Install-Module -Name posh-git -Force
+- cinst au
 
 image: WMF 5
 
