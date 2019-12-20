@@ -1,3 +1,4 @@
 Source/.vscode/launch.json
 Chocolatey/Invoke-Install/*.nupkg
 Chocolatey/Invoke-Install/Readme.md
+Chocolatey/Invoke-Install/tools/Invoke-Install/
